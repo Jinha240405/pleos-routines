@@ -36,3 +36,24 @@ export const templates = [
   },
 ];
 export const blankWorkspace = () => state(start());
+import {apiNode,literal} from './api.js';
+
+const compare=(source,op,value)=>node('logic_compare',{OP:op},{A:source,B:literal(value)});
+const all=(a,b)=>node('logic_operation',{OP:'AND'},{A:a,B:b});
+const either=(a,b)=>node('logic_operation',{OP:'OR'},{A:a,B:b});
+const result=(id)=>node('result_get',{SOURCE:id,PATH:''});
+function api(id,values=[],after){const n=apiNode(id);values.forEach((v,i)=>{if(v!==undefined)n.inputs['ARG'+i]={block:literal(v)}});if(after)n.next={block:after};return n;}
+function read(id,values=[]){return {...api(id,values),type:'api_read'};}
+const branch=(condition,yes,no)=>node('flow_if',{}, {CONDITION:condition,THEN:yes,...(no?{ELSE:no}:{})});
+const sample=(id,args,value)=>({id,args,value});
+templates.forEach((t,i)=>{t.category=['쾌적함','출발','충전','도착'][i];});
+templates.push(
+  {id:'warm',name:'쌀쌀한 아침',icon:'climate',category:'쾌적함',tag:'18°C 미만 → 따뜻하게',description:'차 안이 추울 때만 온도를 23°C로 맞춰요.',workspace:state(start(branch(compare(signal('temperature'),'LT',18),node('vehicle_climate',{}, {VALUE:number(23)},node('vehicle_fan',{}, {VALUE:number(2)},notify('따뜻한 출발을 준비했어요.'))),notify('지금 온도가 적당해요.'))))},
+  {id:'quiet',name:'조용하고 시원하게',icon:'fan',category:'쾌적함',tag:'온도 + 도어 · 모든 조건',description:'문이 닫히고 더울 때, 약한 바람으로 냉방해요.',workspace:state(start(branch(all(compare(signal('temperature'),'GT',26),compare(signal('door'),'EQ',false)),node('vehicle_climate',{}, {VALUE:number(23)},node('vehicle_fan',{}, {VALUE:number(1)},notify('약한 바람으로 시원하게 맞췄어요.'))),notify('문과 실내 온도를 확인했어요.'))))},
+  {id:'charger',name:'충전소 찾아보기',icon:'battery',category:'충전',tag:'배터리 30% 미만 → 충전소',description:'배터리가 부족할 때 주변 충전소 화면을 열어요.',workspace:state(start(branch(compare(signal('battery'),'LT',30),notify('배터리가 부족해요. 가까운 충전소를 확인해 주세요.',api('Navi.requestNavigationScreen',['NearbyChargingStations',''])),notify('아직 배터리에 여유가 있어요.'))))},
+  {id:'charge-ready',name:'충전 80% 알림',icon:'battery',category:'충전',tag:'배터리 변화 → 80% 이상',description:'앱을 열어 둔 동안 충전 목표에 도달하면 알려요.',workspace:state(node('routine_event',{EVENT:'battery'}, {},branch(compare(signal('battery'),'GTE',80),notify('배터리 80% 이상 충전됐어요. 출발 준비를 확인해 주세요.'))))},
+  {id:'rain',name:'빗길 출발 안내',icon:'activity',category:'출발',tag:'와이퍼 작동 → 안내',description:'와이퍼 상태를 조건 안에서 바로 확인해요.',samples:[sample('Wiper.getCurrentWiperState',['FRONT_WINDSHIELD'],'ON')],workspace:state(start(branch(compare(read('Wiper.getCurrentWiperState',['FRONT_WINDSHIELD']),'EQ','ON'),notify('와이퍼가 작동 중이에요. 젖은 노면에서는 차간 거리를 충분히 유지해 주세요.'),notify('와이퍼가 작동하지 않고 있어요.'))))},
+  {id:'belt',name:'동승석 안전벨트 확인',icon:'door',category:'출발',tag:'조회 2개 → 조건으로 연결',description:'사람이 앉아 있고 벨트가 풀려 있을 때만 알려요.',samples:[sample('Seat.getCurrentSeatOccupancy',['ROW_1_RIGHT'],true),sample('Seat.getCurrentSeatBeltBuckledState',['ROW_1_RIGHT'],false)],workspace:state(start({...api('Seat.getCurrentSeatOccupancy',['ROW_1_RIGHT']),id:'belt-seat',next:{block:{...api('Seat.getCurrentSeatBeltBuckledState',['ROW_1_RIGHT']),id:'belt-buckle',next:{block:branch(all(compare(result('belt-seat'),'EQ',true),compare(result('belt-buckle'),'EQ',false)),notify('동승석 안전벨트를 확인해 주세요.'),notify('동승석 안전벨트 확인을 마쳤어요.'))}}}}))},
+  {id:'rear-seat',name:'내리기 전 뒷좌석 확인',icon:'door',category:'도착',tag:'뒷좌석 중 하나라도 탑승',description:'뒷좌석 센서에 탑승이 감지되면 한 번 더 확인해요.',samples:[sample('Seat.getCurrentSeatOccupancy',['ROW_2_LEFT'],true),sample('Seat.getCurrentSeatOccupancy',['ROW_2_RIGHT'],false)],workspace:state(start(branch(either(compare(read('Seat.getCurrentSeatOccupancy',['ROW_2_LEFT']),'EQ',true),compare(read('Seat.getCurrentSeatOccupancy',['ROW_2_RIGHT']),'EQ',true)),notify('뒷좌석에 탑승이 감지됐어요. 내리기 전에 뒷좌석을 확인해 주세요.'),notify('뒷좌석 센서 확인을 마쳤어요. 소지품도 챙겨 주세요.'))))},
+  {id:'parked-door',name:'정차 중 문 열림 안내',icon:'bell',category:'도착',tag:'정차 + 문 열림 · 모든 조건',description:'문이 열리면 정차 상태인지 확인하고 소지품을 알려요.',workspace:state(node('routine_event',{EVENT:'door'}, {},branch(all(compare(signal('door'),'EQ',true),compare(signal('speed'),'EQ',0)),notify('내리기 전에 휴대폰과 소지품을 챙겨 주세요.'))))}
+);

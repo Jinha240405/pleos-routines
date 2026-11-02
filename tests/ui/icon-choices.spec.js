@@ -12,7 +12,7 @@ test('icon start choices retain per-mode settings and the downstream flow',async
 });
 test('value kinds and watched signals are icon choices with keyboard support',async({page})=>{
  await page.goto('/');await ready(page);await page.locator('[data-type="flow_if"] .card-main').tap();await expect(page.locator('.flow-dialog select')).toHaveCount(0);
- await page.getByRole('button',{name:'확인할 상태 종류',exact:true}).tap();await expect(page.getByRole('radio',{name:'연결된 값',exact:true})).toBeVisible();await page.getByRole('radio',{name:'차량 상태',exact:true}).tap();
+ await page.getByRole('button',{name:'고급 편집',exact:true}).tap();await page.getByRole('button',{name:'확인할 상태 종류',exact:true}).tap();await expect(page.getByRole('radio',{name:'연결된 값',exact:true})).toBeVisible();await page.getByRole('radio',{name:'차량 상태',exact:true}).tap();
  const signals=page.getByRole('radiogroup',{name:'확인할 상태 차량 상태'});await signals.getByRole('radio',{name:'실내 온도',exact:true}).focus();await page.keyboard.press('ArrowRight');await expect(signals.getByRole('radio',{name:'배터리',exact:true})).toHaveAttribute('aria-checked','true');await page.getByRole('button',{name:'적용',exact:true}).tap();await expect(page.locator('[data-type="flow_if"]')).toContainText('배터리');
 });
 for(const width of [1440,375])test(`three visual rounds of trigger choices at ${width}px`,async({page})=>{

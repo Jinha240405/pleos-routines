@@ -11,7 +11,7 @@ export function IconCards({value,options,onChange,label,compact=false,className=
     event.preventDefault();const next=event.key==='Home'?0:event.key==='End'?options.length-1:(index+direction+options.length)%options.length;
     const buttons=event.currentTarget.parentElement.querySelectorAll('[role="radio"]');buttons[next].focus();onChange(options[next].value);
   }
-  return <div className={`icon-choices ${compact?'compact':''} ${className}`} role="radiogroup" aria-label={label}>{options.map((o,i)=><button key={o.value} type="button" role="radio" aria-label={o.label} aria-checked={value===o.value} tabIndex={i===(selected<0?0:selected)?0:-1} onKeyDown={e=>navigate(e,i)} onClick={()=>{if(value!==o.value)onChange(o.value)}}><span className="choice-symbol"><Icon name={o.icon}/></span><span className="choice-copy"><strong>{o.label}</strong>{o.description&&<small>{o.description}</small>}</span><span className="choice-check"><Icon name="check"/></span></button>)}</div>
+  return <div className={`icon-choices ${compact?'compact':''} ${className}`} role="radiogroup" aria-label={label}>{options.map((o,i)=><button key={o.value} type="button" role="radio" aria-label={o.label} aria-checked={value===o.value} tabIndex={i===(selected<0?0:selected)?0:-1} onKeyDown={e=>navigate(e,i)} onClick={()=>onChange(o.value)}><span className="choice-symbol"><Icon name={o.icon}/></span><span className="choice-copy"><strong>{o.label}</strong>{o.description&&<small>{o.description}</small>}</span><span className="choice-check"><Icon name="check"/></span></button>)}</div>
 }
 export function IconSelect({value,options,onChange,label}){
   const [open,setOpen]=useState(false),id=useId(),trigger=useRef(null),current=options.find(o=>o.value===value)||options[0];

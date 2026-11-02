@@ -7,7 +7,7 @@ export const BLOCK_TYPES = new Set([
   'value_number', 'value_text', 'value_boolean', 'value_join', 'value_math',
   'logic_compare', 'logic_operation', 'logic_not', 'variable_set', 'variable_get',
   'vehicle_signal', 'vehicle_climate', 'vehicle_fan', 'action_notify', 'action_speak',
-  'api_call', 'api_read', 'routine_api_event', 'value_property', 'value_json', 'event_value',
+  'api_call', 'api_read', 'routine_api_event', 'value_property', 'value_json', 'event_value', 'result_get',
 ]);
 const STATEMENTS = new Set(['routine_start', 'routine_event', 'routine_api_event', 'api_call', 'flow_if', 'flow_repeat', 'flow_while', 'flow_wait', 'flow_stop', 'variable_set', 'vehicle_climate', 'vehicle_fan', 'action_notify', 'action_speak']);
 const input = (block, name) => block.inputs?.[name]?.block ?? block.inputs?.[name]?.shadow;
@@ -113,6 +113,10 @@ export class RoutineRunner {
       }
       case 'vehicle_signal': return this.external(() => this.adapter.read(f.SIGNAL), block);
       case 'api_read': return propertyOf(await this.apiCall(block),String(f.PATH||''));
+      case 'result_get': {
+        if(!this.results.has(f.SOURCE))throw new RoutineError('연결한 조회를 이 조건보다 앞에서 실행해 주세요.',block.id);
+        return propertyOf(this.results.get(f.SOURCE),String(f.PATH||''));
+      }
       case 'value_json': {try{return JSON.parse(String(f.VALUE));}catch{throw new RoutineError('구조화된 값의 JSON 형식을 확인해 주세요.',block.id);}}
       case 'event_value': if(this.eventValue===undefined)throw new RoutineError('감지 이벤트로 실행할 때 사용할 수 있어요.',block.id);return propertyOf(this.eventValue,String(f.PATH||''));
       case 'value_property': return propertyOf(await val('VALUE'),String(f.PATH||''));
@@ -162,7 +166,9 @@ export class RoutineRunner {
       switch (block.type) {
         case 'routine_start': case 'routine_event': case 'routine_api_event': break;
         case 'api_call': {
-          const value=propertyOf(await this.apiCall(block),String(block.fields?.PATH||''));
+          const raw=await this.apiCall(block);
+          if(block.id)this.results.set(block.id,raw);
+          const value=propertyOf(raw,String(block.fields?.PATH||''));
           const name=String(block.fields?.NAME||'').trim();
           if(name){if(name.length>50)throw new RoutineError('변수 이름은 50자 이하여야 해요.',block.id);this.variables.set(name,value);this.options.onVariables(Object.fromEntries(this.variables));}
           break;
@@ -213,7 +219,7 @@ export class RoutineRunner {
     validateWorkspace(workspace);
     const starts = roots(workspace).filter(b => !b.disabled && b.enabled !== false && (event === 'manual' ? b.type === 'routine_start' : typeof event==='object' ? b.type==='routine_api_event' && b.id===event.rootId : b.type === 'routine_event' && b.fields?.EVENT === event));
     if (!starts.length) throw new RoutineError(event === 'manual' ? '“실행 버튼을 눌렀을 때” 블록을 추가해 주세요.' : '이 이벤트에 연결된 시작 블록이 없어요.');
-    this.running = true; this.stopped = false; this.steps = 0; this.variables = new Map();
+    this.running = true; this.stopped = false; this.steps = 0; this.variables = new Map(); this.results = new Map();
     this.eventValue=typeof event==='object'?event.value:undefined;
     this.controller = new AbortController(); this.deadline = Date.now() + this.options.maxDuration;
     this.options.onVariables({});

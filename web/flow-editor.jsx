@@ -6,6 +6,8 @@ import { apiNode, operationMap, literalArguments, literal, optionLabel, validate
 import { ApiFields, ApiPickerOptions } from './api-ui.jsx';
 import {Icon,operationIcon} from './icons';
 import {TouchChoice,TouchNumber,TouchText,FieldPicker,ResultValues,IconCards,IconSelect} from './touch-controls';
+import {ConditionEditor,SourcePicker} from './condition-editor';
+import {contextBefore,sourceInfo,duplicateWithReferences,conditionSummary,simpleConditions} from './condition-model';
 const ValuesContext=createContext({names:['조회 결과','기준값'],eventId:null,sources:{}});
 
 const copy = value => JSON.parse(JSON.stringify(value));
@@ -21,9 +23,10 @@ const startOptions=[
  {value:'routine_api_event',label:'상태 변화 감지',icon:'radar',description:'차량·위치·음성 이벤트'},
 ];
 const signalOptions=[{value:'door',label:'도어',icon:'Door',description:'운전석 문'},{value:'temperature',label:'실내 온도',icon:'climate',description:'현재 온도'},{value:'battery',label:'배터리',icon:'EvBattery',description:'충전 잔량'},{value:'speed',label:'주행 속도',icon:'DrivingMode',description:'현재 속도'}];
-const valueIcons={value_number:'number',value_text:'text',value_boolean:'yes',vehicle_signal:'CarInfo',api_read:'link',variable_get:'layers',value_property:'result',event_value:'radar',value_json:'json',logic_compare:'branch',logic_operation:'layers',logic_not:'no',value_math:'calculator',value_join:'link'};
+const valueIcons={result_get:'result',value_number:'number',value_text:'text',value_boolean:'yes',vehicle_signal:'CarInfo',api_read:'link',variable_get:'layers',value_property:'result',event_value:'radar',value_json:'json',logic_compare:'branch',logic_operation:'layers',logic_not:'no',value_math:'calculator',value_join:'link'};
 const operators = { EQ: '=', NEQ: '≠', GT: '>', LT: '<', GTE: '≥', LTE: '≤', AND: '그리고', OR: '또는', ADD: '+', MINUS: '−', MULTIPLY: '×', DIVIDE: '÷', MOD: '나머지' };
 const definitions = {
+  result_get:['앞에서 읽은 값','result','값'],
   api_call: ['차량·연결 기능', 'activity', '연결'], api_read:['연결된 값','activity','값'], routine_api_event:['상태 변화 감지','activity','시작'],value_property:['결과 항목 읽기','variable','값'],value_json:['구조화된 값','variable','값'],event_value:['이벤트 값','activity','값'],
   routine_start: ['직접 실행', 'play', '시작'], routine_event: ['상태가 바뀌면', 'activity', '시작'],
   flow_if: ['조건에 따라 나누기', 'branch', '조건'], flow_repeat: ['횟수만큼 반복', 'repeat', '흐름'], flow_while: ['조건 동안 반복', 'repeat', '흐름'], flow_wait: ['잠시 대기', 'clock', '흐름'], flow_stop: ['루틴 종료', 'stop', '흐름'],
@@ -79,7 +82,8 @@ export function describe(node) {
   if (!node) return '설정 필요';
   const f = node.fields || {}, v = key => describe(inputOf(node, key));
   switch (node.type) {
-    case 'api_call': return `${operationMap.get(f.API)?.label||'기능 선택'}${f.NAME?` → ${f.NAME}`:''}`;
+    case 'api_call': return ['read','capability'].includes(operationMap.get(f.API)?.kind)?'이 값을 다음 조건·동작에서 바로 사용해요':operationMap.get(f.API)?.label||'기능 선택';
+    case 'result_get': return '앞에서 읽은 값';
     case 'api_read': return operationMap.get(f.API)?.label||'연결된 값';
     case 'routine_api_event': return `${operationMap.get(f.API)?.label||'차량 상태'} 변경 시`;
     case 'event_value': return f.PATH?`이벤트 · ${f.PATH}`:'이벤트 값';
@@ -140,7 +144,7 @@ export function createFlowEditor(element, onChange, onError) {
     addRoot(type) { change(s => s.blocks.blocks.push(typeof type==='string'?freshNode(type):copy(type))); },
     removeRoot(id) { change(s => { s.blocks.blocks = s.blocks.blocks.filter(n => n.id !== id); }); },
     remove(location, id) { change(s => putList(s, location, getList(s, location).filter(n => n.id !== id))); },
-    duplicate(location, id) { change(s => { const nodes = getList(s, location), index = nodes.findIndex(n => n.id === id); const node = copy(nodes[index]); delete node.next; walk({ blocks: { blocks: [node] } }, n => { n.id = uid(); }); nodes.splice(index + 1, 0, node); putList(s, location, nodes); }); },
+    duplicate(location, id) { change(s => { const nodes = getList(s, location), index = nodes.findIndex(n => n.id === id); const node = duplicateWithReferences(nodes[index],uid); nodes.splice(index + 1, 0, node); putList(s, location, nodes); }); },
     move(source, destination, index) {
       change(s => {
         const from = getList(s, source), at = from.findIndex(n => n.id === source.id); if (at < 0) return;
@@ -162,9 +166,10 @@ function Modal({ title, children, onClose, className = '' }) {
   useEffect(() => { const el = ref.current; el.showModal(); return () => { el.close(); }; }, []);
   return <dialog ref={ref} className={`flow-dialog ${className}`} onCancel={onClose} onClick={e => { if (e.target === ref.current) { const r = ref.current.getBoundingClientRect(); if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) onClose(); } }}><div className="dialog-header"><h2>{title}</h2><Button variant="ghost" size="icon" onClick={onClose} aria-label="닫기"><Icon name="close" /></Button></div>{children}</dialog>;
 }
-const expressionTypes = ['value_number', 'value_text', 'value_boolean', 'vehicle_signal', 'api_read', 'variable_get', 'value_property', 'event_value', 'value_json', 'logic_compare', 'logic_operation', 'logic_not', 'value_math', 'value_join'];
+const expressionTypes = ['value_number', 'value_text', 'value_boolean', 'vehicle_signal', 'api_read', 'result_get', 'variable_get', 'value_property', 'event_value', 'value_json', 'logic_compare', 'logic_operation', 'logic_not', 'value_math', 'value_join'];
 function Expression({ node, onChange, label, depth = 0 }) {
  const n=node||freshNode('value_number'),f=n.fields||{},context=useContext(ValuesContext);
+ const [choosingResult,setChoosingResult]=useState(false);
  const field=(key,value)=>onChange({...n,fields:{...f,[key]:value}}),sub=(key,value)=>onChange({...n,inputs:{...n.inputs,[key]:{block:value}}});
  const comparison=n.type==='logic_compare',left=inputOf(n,'A'),schema=left?.type==='api_read'?operationMap.get(left.fields?.API)?.result:null;
  const compareNames={GT:'보다 높으면',GTE:'이상이면',LT:'보다 낮으면',LTE:'이하이면',EQ:'같으면',NEQ:'다르면'};
@@ -176,6 +181,7 @@ function Expression({ node, onChange, label, depth = 0 }) {
  {n.type==='variable_get'&&<TouchChoice label={label} value={f.NAME} options={variableOptions} onChange={v=>field('NAME',v)}/>}
  {n.type==='vehicle_signal'&&<IconCards compact className="signal-choices" label={label+' 차량 상태'} value={f.SIGNAL} options={signalOptions} onChange={v=>field('SIGNAL',v)}/>}
  {n.type==='value_boolean'&&<IconCards compact label={label} value={f.VALUE} options={[{value:'TRUE',label:'해당함',icon:'yes'},{value:'FALSE',label:'해당 없음',icon:'no'}]} onChange={v=>field('VALUE',v)}/>}
+ {n.type==='result_get'&&(choosingResult?<SourcePicker context={context} onClose={()=>setChoosingResult(false)} onPick={v=>{onChange(v);setChoosingResult(false)}}/>:<Button type="button" variant="outline" onClick={()=>setChoosingResult(true)}><Icon name="result"/>{sourceInfo(n,context).label} · 변경</Button>)}
  </div>
  {n.type==='api_read'&&<ApiFields node={n} onChange={onChange} kinds={['read','capability']} Expression={Expression}/>}
  {n.type==='value_json'&&<ResultValues value={JSON.parse(f.VALUE||'null')}/>}
@@ -188,7 +194,17 @@ function Expression({ node, onChange, label, depth = 0 }) {
  {depth<80&&n.type==='logic_not'&&<Expression label="조건 값" node={inputOf(n,'VALUE')} onChange={v=>sub('VALUE',v)} depth={depth+1}/>}
  </fieldset>;
 }
-function EditModal({ node, onClose, onSave }) {
+function SimpleValue({node,onChange,label}) {
+ const context=useContext(ValuesContext),[choosing,setChoosing]=useState(node?.type==='result_get'&&!node.fields?.SOURCE),[advanced,setAdvanced]=useState(false);
+ const n=node||number(0),fixed=['value_number','value_text','value_boolean'].includes(n.type);
+ if(choosing)return <SourcePicker context={context} onClose={()=>setChoosing(false)} onPick={v=>{onChange(v);setChoosing(false)}}/>;
+ if(advanced)return <><Expression label={label} node={n} onChange={onChange}/><Button type="button" variant="ghost" onClick={()=>setAdvanced(false)}>간단히 보기</Button></>;
+ return <section className="simple-value"><div className="simple-value-heading"><span className="control-label">{label}</span><button type="button" className="text-button" onClick={()=>fixed?setChoosing(true):onChange(/내용/.test(label)?text('출발 준비 완료'):number(0))}>{fixed?'읽은 값 사용':'직접 입력'}</button></div>
+  {n.type==='value_number'?<TouchNumber label={label} value={n.fields.VALUE} onChange={v=>onChange({...n,fields:{VALUE:v}})} {...(/온도/.test(label)?{min:16,max:30,step:0.5,unit:'°C'}:/풍량/.test(label)?{min:0,max:8,unit:'단계'}:/대기/.test(label)?{min:0,max:30,unit:'초'}:/횟수/.test(label)?{min:0,max:100,unit:'회'}:{})}/>:n.type==='value_text'?<TouchText label={label} value={n.fields.VALUE} onChange={v=>onChange(text(v))}/>:n.type==='value_boolean'?<TouchChoice label={label} value={n.fields.VALUE==='TRUE'} options={[[true,'해당함'],[false,'해당 없음']]} onChange={v=>onChange(literal(v))}/>:<Button type="button" variant="outline" className="simple-source-value" onClick={()=>setChoosing(true)}><Icon name={sourceInfo(n,context).icon}/>{sourceInfo(n,context).label}<Icon name="next"/></Button>}
+  <button type="button" className="text-button value-advanced-link" onClick={()=>setAdvanced(true)}>계산·고급 값</button>
+ </section>;
+}
+function EditModal({ node, onClose, onSave, context }) {
   const [draft, setDraft] = useState(() => copy(node));
   const [error, setError] = useState('');
   const startDrafts=useRef(new Map([[node.type,copy(node)]]));
@@ -209,10 +225,10 @@ function EditModal({ node, onClose, onSave }) {
     {node.type === 'flow_stop' && <p className="form-note">이 단계에 도착하면 루틴 실행을 종료합니다.</p>}
     {draft.type==='routine_event'&&<section className="watched-state-section"><h3 className="choice-heading">감지할 상태</h3><IconCards compact className="signal-choices" label="감지할 상태" value={draft.fields.EVENT} options={signalOptions.filter(o=>o.value!=='speed')} onChange={v=>setDraft({...draft,fields:{EVENT:v}})}/><p className="form-note">테스트 설정에서 감지를 시작하면 이 상태가 바뀔 때 실행해요.</p></section>}
     {node.type === 'variable_set' && <label className="form-field">변수 이름<input required maxLength={80} value={draft.fields.NAME} onChange={e => setDraft({ ...draft, fields: { ...draft.fields, NAME: e.target.value } })} /></label>}
-    {['api_call','routine_api_event'].includes(draft.type)&&<ApiFields node={draft} onChange={setDraft} kinds={draft.type==='routine_api_event'?['subscribe']:['read','write','capability']} Expression={Expression} fixed={draft.type==='routine_api_event'}/>}
+    {['api_call','routine_api_event'].includes(draft.type)&&<ApiFields node={draft} onChange={setDraft} kinds={draft.type==='routine_api_event'?['subscribe']:['read','write','capability']} Expression={SimpleValue} fixed={draft.type==='routine_api_event'}/>}
     {draft.type==='routine_api_event'&&<p className="form-note">테스트 설정에서 ‘상태 감지 시작’을 누르면 현재 화면에서 감지합니다. 이벤트 값은 조건과 동작에 연결할 수 있어요.</p>}
-    {draft.type==='api_call'&&<details className="save-result-options" open={operationMap.get(draft.fields.API)?.kind==='read'}><summary>읽은 값을 다른 블록에서 사용</summary><TouchChoice label="결과 저장" value={draft.fields.NAME||''} options={[['','저장 안 함'],['조회 결과','조회 결과'],[operationMap.get(draft.fields.API)?.label+' 결과',operationMap.get(draft.fields.API)?.label+' 결과']]} onChange={v=>setDraft({...draft,fields:{...draft.fields,NAME:v}})}/>{draft.fields.NAME&&<FieldPicker label="저장할 항목" operationId={draft.fields.API} value={draft.fields.PATH} onChange={v=>setDraft({...draft,fields:{...draft.fields,PATH:v}})}/>}</details>}
-    {(params[node.type] || []).map(([key, label]) => <Expression key={key} label={label} node={inputOf(draft, key)} onChange={n => setDraft({ ...draft, inputs: { ...draft.inputs, [key]: { block: n } } })} />)}
+    {draft.type==='api_call'&&<><p className="result-ready-note"><Icon name="result"/>결과는 다음 조건·동작에서 바로 선택할 수 있어요.</p><details className="save-result-options"><summary>고급 · 변수로도 저장</summary><TouchChoice label="결과 저장" value={draft.fields.NAME||''} options={[...new Set(['',draft.fields.NAME,'조회 결과',operationMap.get(draft.fields.API)?.label+' 결과'])].filter(v=>v!==undefined).map(v=>[v,v||'변수로 저장 안 함'])} onChange={v=>setDraft({...draft,fields:{...draft.fields,NAME:v}})}/>{draft.fields.NAME&&<FieldPicker label="저장할 항목" operationId={draft.fields.API} value={draft.fields.PATH} onChange={v=>setDraft({...draft,fields:{...draft.fields,PATH:v}})}/>}</details></>}
+    {(params[node.type] || []).map(([key, label]) => key==='CONDITION'?<ConditionEditor key={key} node={inputOf(draft,key)} onChange={n=>setDraft({...draft,inputs:{...draft.inputs,[key]:{block:n}}})} context={context} Expression={Expression}/>:<SimpleValue key={key} label={label} node={inputOf(draft, key)} onChange={n => setDraft({ ...draft, inputs: { ...draft.inputs, [key]: { block: n } } })} />)}
     {expressionTypes.includes(node.type) && <Expression label="값" node={draft} onChange={n => setDraft({ ...n, id: draft.id, ...(draft.next ? { next: draft.next } : {}) })} />}
     {node.type.startsWith('vehicle_') && node.type !== 'vehicle_signal' && <p className="form-note">Pleos 연결에서는 운전석 공조를 제어합니다. 기기에서 지원하는 범위 안에서 실행됩니다.</p>}
     {error && <p role="alert" className="error-text">{error}</p>}
@@ -247,13 +263,15 @@ function FlowEditor({ api }) {
   function renderCard({ node, location, index, total, root = false }) {
     const [baseTitle, symbol, category] = definitions[node.type] || ['동작', 'variable', ''];
     const title=node.type==='api_call'?operationMap.get(node.fields?.API)?.label||baseTitle:node.type==='routine_api_event'?(operationMap.get(node.fields?.API)?.label||'상태 변화')+' 감지':node.type==='routine_event'?(signalOptions.find(o=>o.value===node.fields.EVENT)?.label||'차량 상태')+' 감지':baseTitle;
+    const conditions=['flow_if','flow_while'].includes(node.type)?simpleConditions(inputOf(node,'CONDITION')):null;
+    const description=conditions?conditions.rows.map(row=>conditionSummary(row,contextBefore(api.state,node.id))).join(conditions.mode==='AND'?' · 그리고 ':' · 또는 '):describe(node);
     const current = node.id === api.highlightId || (!childKeys.some(k => inputOf(node, k)) && nodeContains(node, api.highlightId));
     const fault = api.warning && nodeContains(node, api.warning.id);
     const trigger = node.type.startsWith('routine_');
     const disabled = node.enabled === false || node.disabled === true;
     return <article className={`flow-card ${disabled ? 'is-disabled' : ''} ${trigger ? 'trigger-card' : ''} ${['vehicle_climate','vehicle_fan','flow_wait'].includes(node.type) ? 'numeric-card' : ''} ${current ? 'is-active' : ''} ${fault ? 'has-error' : ''} ${drop === node.id ? 'drop-before' : ''}`} data-node-id={node.id} data-type={node.type} onDragOver={e => { if (!root && drag.current && !locked) { e.preventDefault(); e.stopPropagation(); setDrop(node.id); } }} onDrop={e => !root && acceptDrop(e, location, index)}>
       {!root && <button className="drag-handle" draggable={!locked} disabled={locked} aria-label={`${title} 끌어서 이동`} onDragStart={e => { drag.current = { ...location, id: node.id }; e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', node.id); setMenu(null); }} onDragEnd={() => { drag.current = null; setDrop(null); }}><Icon name="drag" /></button>}
-      <button className="card-main" disabled={locked} onClick={() => edit(node)} aria-label={`${title} 설정: ${describe(node)}`}><span className={`node-icon ${trigger ? 'trigger-icon' : ''}`}><Icon name={node.fields?.API?operationIcon(operationMap.get(node.fields.API)):node.type==='routine_event'?signalOptions.find(o=>o.value===node.fields.EVENT)?.icon:symbol} /></span><span className="node-copy"><span className="node-title">{title}{disabled && <span className="node-tag">사용 안 함</span>}{trigger && <span className="node-tag">시작</span>}</span><span className={`node-description ${['vehicle_climate', 'vehicle_fan', 'flow_wait'].includes(node.type) ? 'numeric-value' : ''}`}>{describe(node)}</span></span></button>
+      <button className="card-main" disabled={locked} onClick={() => edit(node)} aria-label={`${title} 설정: ${description}`}><span className={`node-icon ${trigger ? 'trigger-icon' : ''}`}><Icon name={node.fields?.API?operationIcon(operationMap.get(node.fields.API)):node.type==='routine_event'?signalOptions.find(o=>o.value===node.fields.EVENT)?.icon:symbol} /></span><span className="node-copy"><span className="node-title">{title}{disabled && <span className="node-tag">사용 안 함</span>}{trigger && <span className="node-tag">시작</span>}</span><span className={`node-description ${['vehicle_climate', 'vehicle_fan', 'flow_wait'].includes(node.type) ? 'numeric-value' : ''}`}>{description}</span></span></button>
       <div className="node-menu-anchor"><button className="node-menu-button" disabled={locked} aria-label={`${title} 메뉴`} aria-expanded={menu === node.id} onClick={() => setMenu(menu === node.id ? null : node.id)}><Icon name="more" /></button>{menu === node.id && <div className="node-menu" role="menu" onKeyDown={e => { if (e.key === 'Escape') { e.stopPropagation(); setMenu(null); e.currentTarget.parentElement.querySelector('.node-menu-button').focus(); } else if (['ArrowDown','ArrowUp','Home','End'].includes(e.key)) { e.preventDefault(); const items=[...e.currentTarget.querySelectorAll('button:not(:disabled)')]; const index=items.indexOf(document.activeElement); items[e.key === 'Home' ? 0 : e.key === 'End' ? items.length-1 : (index+(e.key === 'ArrowDown' ? 1 : -1)+items.length)%items.length]?.focus(); } }}><button role="menuitem" onClick={() => edit(node)}>설정 변경</button>{!root && <><button role="menuitem" disabled={index === 0} onClick={() => { api.move({ ...location, id: node.id }, location, index - 1); setMenu(null); }}>위로 이동</button><button role="menuitem" disabled={index === total - 1} onClick={() => { api.move({ ...location, id: node.id }, location, index + 2); setMenu(null); }}>아래로 이동</button><button role="menuitem" onClick={() => { api.duplicate(location, node.id); setMenu(null); }}>복제</button></>}{root && <button role="menuitem" onClick={() => {setAdding("root");setMenu(null);}}>시작 방식 추가</button>}<button role="menuitem" onClick={() => {api.edit({...node,enabled:disabled,disabled:!disabled});setMenu(null);}}>{disabled ? "사용" : "사용 안 함"}</button><button role="menuitem" className="danger" onClick={() => { root ? api.removeRoot(node.id) : api.remove(location, node.id); setMenu(null); }}>삭제</button></div>}</div>
       {fault && <p className="node-error">{api.warning.message}</p>}
     </article>;
@@ -264,6 +282,6 @@ function FlowEditor({ api }) {
   }
   const names=['조회 결과','기준값'],sources={};let eventId=null;walk(api.state,n=>{if(n.fields?.NAME)names.push(n.fields.NAME);if(n.type==='api_call'&&n.fields.NAME)sources[n.fields.NAME]=n.fields.API;if(n.type==='routine_api_event')eventId=n.fields.API});
   return <ValuesContext.Provider value={{names:[...new Set(names)],eventId,sources}}><div className="flow-canvas" onKeyDown={e => { if (e.key === 'Escape') setMenu(null); }}>{api.state.blocks.blocks.map(root => <section key={root.id} className="flow-root" aria-label="자동화 흐름"><div className="root-card-wrap">{renderCard({node:root, root:true})}</div>{root.type === 'flow_if' && <div className="branch-grid">{renderList({parent:root, branch:"THEN", label:"조건 충족"})}{renderList({parent:root, branch:"ELSE", label:"미충족"})}</div>}{['flow_repeat', 'flow_while'].includes(root.type) && renderList({parent:root, branch:"DO", label:"반복할 동작"})}{renderList({parent:root, branch:"next"})}</section>)}{!api.state.blocks.blocks.length && <button className="add-trigger" disabled={locked} onClick={() => setAdding('root')}><Icon name="plus" />{api.state.blocks.blocks.length ? '다른 시작 방식 추가' : '시작 방식 선택'}</button>}</div>
-    {editing && <EditModal key={editing.id} node={editing} onClose={() => setEditing(null)} onSave={node => api.edit(node)} />}
+    {editing && <ValuesContext.Provider value={{...contextBefore(api.state,editing.id),names:[...new Set(names)],sources,eventId:contextBefore(api.state,editing.id).event?.fields.API}}><EditModal key={editing.id} node={editing} context={contextBefore(api.state,editing.id)} onClose={() => setEditing(null)} onSave={node => api.edit(node)} /></ValuesContext.Provider>}
     {adding && <Picker location={adding} onClose={() => setAdding(null)} onPick={type => { adding === 'root' ? api.addRoot(type) : api.add(adding, type); setAdding(null); }} />}
   </ValuesContext.Provider>;}

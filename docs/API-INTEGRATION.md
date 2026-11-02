@@ -1,4 +1,4 @@
-# API integration — 0.4.1
+# API integration — 0.5.0
 
 ## Layout and design
 
@@ -9,6 +9,8 @@ Use the official Pleos Connect Asta Sans font, neutral color tokens, 48px touch 
 The user's subsequent requirement is touch-only routine configuration with recognizable blocks. Primary flow: choose a category tile → choose a named function block → adjust large controls → apply. Do not require API identifiers, JSON, property paths, typed enum names or coordinate strings. Use segmented choices, seat-position tiles, steppers, sliders and an on-screen numeric pad. Text actions offer ready-made phrases and optional phone-style text input. Responses are labelled values; complex response fields are selected from a tree after a read. Keep technical diagnostics out of the primary editor. The existing Vehicle/Connect adapters remain the execution layer.
 
 ## Implementation contract
+
+API call results are retained per block ID for the current execution. `result_get` references that ID and an optional property path without requiring a variable name. Existing named-variable files retain their behavior. The editor offers preceding reads in the current execution path, identifies fields from known schemas or observed responses, and allows inline `api_read` conditions. The simple condition UI and source picker are shared by action input bindings; advanced expressions remain available without automatic rewriting.
 
 Start methods, common watched signals and expression kinds use icon cards instead of native selects. Each start method retains its own draft while switching. The monitoring entry point is a labelled icon card, with an explicit selected check and foreground-only scope. The launcher and favicon use the existing two-dot Routines path mark.
 

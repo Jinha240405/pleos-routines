@@ -2,7 +2,7 @@
   "packageName": "dev.pleoslab",
   "appDescription": "Create and run user-defined vehicle routines.",
   "invokeWord": "루틴",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "actionCalls": [
     {
       "type": "function",

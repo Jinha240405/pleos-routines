@@ -4,6 +4,7 @@ import './api.css';
 import '@fontsource-variable/asta-sans';
 import './pleos-theme.css';
 import './choice-cards.css';
+import './conditions.css';
 import { configureApi, callApi, watchApi, clearApiWatches, receiveApiEvent, literalArguments, operationMap, apiNode, setSample } from './api.js';
 import { mountApiInspector } from './api-ui.jsx';
 import { mountChrome, updateChrome } from './chrome.jsx';
@@ -76,7 +77,7 @@ try {
 } catch { loadWarning = '저장된 루틴을 읽지 못했어요. 예제로 시작합니다. 기존 저장본은 다음 편집 전까지 유지돼요.'; }
 if (!store) { const first = fresh(templates[0].name, templates[0].workspace); store = { version: 1, activeId: first.id, routines: [first] }; }
 let active = store.routines.find(r => r.id === store.activeId) ?? store.routines[0];
-let loading = false, saveTimer, mode = 'demo', logEntries = [], lastVariables = {}, eventTimer;
+let loading = false, saveTimer, mode = 'demo', logEntries = [], lastVariables = {}, eventTimer, templateCategory = '전체';
 let watchGeneration=0;
 let afterStopEvent=null;
 const demo = { temperature: 28, battery: 72, door: false, speed: 0, climate: 24, fan: 0 };
@@ -106,6 +107,7 @@ function loadRoutine(routine) {
   disarmEvents();
   clearTimeout(eventTimer); $('watchEvents').checked = false; loading = true;
   active = routine; store.activeId = routine.id;
+  for(const sample of templates.find(t=>t.id===routine.templateId)?.samples||[])setSample(sample.id,sample.args,sample.value);
   editor.load(routine.workspace);
   $('routineName').value = routine.name;
   $('routineCount').textContent = store.routines.length;
@@ -113,10 +115,10 @@ function loadRoutine(routine) {
   updateEditorTools(); loading = false;
   $('executionState').textContent = '실행 준비 완료';
 }
-function addRoutine(name, state) {
+function addRoutine(name, state, templateId) {
   if (store.routines.length >= 50) return toast('루틴은 최대 50개까지 저장할 수 있어요.', true);
   persist();
-  const r = fresh(name, state); store.routines.push(r); loadRoutine(r); persist(); showEditor(); toast('새 루틴을 만들었어요. 자유롭게 바꿔보세요.');
+  const r = fresh(name, state); if(templateId)r.templateId=templateId;store.routines.push(r); loadRoutine(r); persist(); showEditor(); toast('새 루틴을 만들었어요. 자유롭게 바꿔보세요.');
 }
 function log(message, kind = 'info') {
   logEntries.unshift({ message, kind, at: new Date().toLocaleTimeString('ko-KR', { hour12: false }) });
@@ -286,10 +288,10 @@ function renderLibrary() {
   $('savedRoutines').replaceChildren(); $('templateRoutines').replaceChildren();
   for (const r of store.routines) {
     const wrapper = document.createElement('div');
-    const trigger = r.workspace.blocks.blocks.some(block => block.type === 'routine_event') ? '이벤트 실행' : '직접 실행';
+    const trigger = r.workspace.blocks.blocks.some(block => ['routine_event','routine_api_event'].includes(block.type)) ? '상태 변화 감지' : '직접 실행';
     wrapper.append(makeCard(r.name, '', 'activity', `${countSteps(r.workspace)}개 단계 · ${trigger}`, () => { loadRoutine(r); showEditor(); }));
     const actions = document.createElement('div'); actions.className = 'card-controls';
-    const duplicate = document.createElement('button'); duplicate.textContent = '복제'; duplicate.onclick = () => addRoutine(`${r.name.slice(0, 72)} 사본`, r.workspace);
+    const duplicate = document.createElement('button'); duplicate.textContent = '복제'; duplicate.onclick = () => addRoutine(`${r.name.slice(0, 72)} 사본`, r.workspace,r.templateId);
     const remove = document.createElement('button'); remove.textContent = '삭제';
     remove.onclick = () => {
       if (!confirm(`“${r.name}” 루틴을 삭제할까요? 내보낸 파일은 유지돼요.`)) return;
@@ -300,7 +302,9 @@ function renderLibrary() {
     };
     actions.append(duplicate, remove); wrapper.append(actions); $('savedRoutines').append(wrapper);
   }
-  for (const t of templates) $('templateRoutines').append(makeCard(t.name, t.description, t.icon, t.tag, () => addRoutine(t.name, t.workspace)));
+  $('templateFilters').replaceChildren();
+  for(const category of ['전체','출발','쾌적함','충전','도착']){const button=document.createElement('button');button.type='button';button.textContent=category;button.setAttribute('aria-pressed',String(templateCategory===category));button.onclick=()=>{templateCategory=category;renderLibrary();[...$('templateFilters').children].find(b=>b.textContent===category)?.focus()};$('templateFilters').append(button);}
+  for (const t of templates.filter(t=>templateCategory==='전체'||t.category===templateCategory)) $('templateRoutines').append(makeCard(t.name, t.description, t.icon, t.tag, () => addRoutine(t.name, t.workspace,t.id)));
 }
 $('routineName').oninput = event => { active.name = event.target.value.trim() || '이름 없는 루틴'; clearTimeout(saveTimer); saveTimer = setTimeout(persist, 350); };
 $('routineName').onblur = () => { $('routineName').value = active.name; };
@@ -348,4 +352,4 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) { run
 window.addEventListener('beforeunload', () => { if (!loading) persist(); disarmEvents();runner.cancel(); });
 loadRoutine(active); renderVehicle(); renderVariables({});
 if (loadWarning) toast(loadWarning, true);
-if (import.meta.env.DEV) window.__app = { editor, runner, snapshot, templates, addRoutine, get store() { return store; }, get demo() { return demo; }, get variables() { return lastVariables; } };
+if (import.meta.env.DEV) window.__app = { editor, runner, snapshot, templates, addRoutine, setSample, get store() { return store; }, get demo() { return demo; }, get variables() { return lastVariables; } };

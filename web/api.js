@@ -19,7 +19,7 @@ export function literal(value) {
 }
 export function apiNode(id, event = false) {
   const op = operation(id);
-  return { type:event?'routine_api_event':'api_call', fields:{API:id,NAME:op.kind==='read'?'조회 결과':'',PATH:''}, inputs:Object.fromEntries(op.params.map((p,i)=>[`ARG${i}`,{block:literal(p.default)}])) };
+  return { type:event?'routine_api_event':'api_call', fields:{API:id,NAME:'',PATH:''}, inputs:Object.fromEntries(op.params.map((p,i)=>[`ARG${i}`,{block:literal(p.default)}])) };
 }
 export function validateArguments(op, args) {
   if(args.length!==op.params.length)throw new Error('기능 입력 개수를 확인해 주세요.');
