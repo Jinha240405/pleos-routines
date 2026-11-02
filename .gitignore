@@ -12,3 +12,11 @@ local.properties
 *.log
 *.hprof
 captures/
+node_modules/
+web/public/DEPENDENCY-LICENSES.txt
+test-results/
+playwright-report/
+app/src/main/assets/editor/
+artifacts/
+web/public/media/
+web/public/BLOCKLY-LICENSE.txt

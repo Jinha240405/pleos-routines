@@ -1,0 +1,1003 @@
+Compiled from "SourceFile"
+public abstract class ai.pleos.playground.vehicle.api.model.area.Area {
+  public ai.pleos.playground.vehicle.api.model.area.Area(kotlin.jvm.internal.DefaultConstructorMarker);
+}
+Compiled from "SourceFile"
+public final class ai.pleos.playground.vehicle.api.model.area.DoorArea extends ai.pleos.playground.vehicle.api.model.area.Area {
+  public ai.pleos.playground.vehicle.api.model.area.DoorArea(ai.pleos.playground.vehicle.constant.area.DoorValue...);
+  public final ai.pleos.playground.vehicle.constant.area.DoorValue[] getValues();
+  public boolean equals(java.lang.Object);
+  public int hashCode();
+}
+Compiled from "SourceFile"
+public final class ai.pleos.playground.vehicle.api.model.area.GlobalArea extends ai.pleos.playground.vehicle.api.model.area.Area {
+  public static final ai.pleos.playground.vehicle.api.model.area.GlobalArea INSTANCE;
+}
+Compiled from "SourceFile"
+public final class ai.pleos.playground.vehicle.api.model.area.MirrorArea extends ai.pleos.playground.vehicle.api.model.area.Area {
+  public ai.pleos.playground.vehicle.api.model.area.MirrorArea(ai.pleos.playground.vehicle.constant.area.MirrorValue...);
+  public final ai.pleos.playground.vehicle.constant.area.MirrorValue[] getValues();
+  public boolean equals(java.lang.Object);
+  public int hashCode();
+}
+Compiled from "SourceFile"
+public final class ai.pleos.playground.vehicle.api.model.area.SeatArea extends ai.pleos.playground.vehicle.api.model.area.Area {
+  public ai.pleos.playground.vehicle.api.model.area.SeatArea(ai.pleos.playground.vehicle.constant.area.SeatValue...);
+  public final ai.pleos.playground.vehicle.constant.area.SeatValue[] getValues();
+  public boolean equals(java.lang.Object);
+  public int hashCode();
+}
+Compiled from "SourceFile"
+public final class ai.pleos.playground.vehicle.api.model.area.TurnSignalArea extends ai.pleos.playground.vehicle.api.model.area.Area {
+  public ai.pleos.playground.vehicle.api.model.area.TurnSignalArea(ai.pleos.playground.vehicle.constant.area.TurnSignalValue...);
+  public final ai.pleos.playground.vehicle.constant.area.TurnSignalValue[] getValues();
+  public boolean equals(java.lang.Object);
+  public int hashCode();
+}
+Compiled from "SourceFile"
+public final class ai.pleos.playground.vehicle.api.model.area.WheelArea extends ai.pleos.playground.vehicle.api.model.area.Area {
+  public ai.pleos.playground.vehicle.api.model.area.WheelArea(ai.pleos.playground.vehicle.constant.area.WheelValue...);
+  public final ai.pleos.playground.vehicle.constant.area.WheelValue[] getValues();
+  public boolean equals(java.lang.Object);
+  public int hashCode();
+}
+Compiled from "SourceFile"
+public final class ai.pleos.playground.vehicle.api.model.area.WindowArea extends ai.pleos.playground.vehicle.api.model.area.Area {
+  public ai.pleos.playground.vehicle.api.model.area.WindowArea(ai.pleos.playground.vehicle.constant.area.WindowValue...);
+  public final ai.pleos.playground.vehicle.constant.area.WindowValue[] getValues();
+  public boolean equals(java.lang.Object);
+  public int hashCode();
+}
+Compiled from "SourceFile"
+public final class ai.pleos.playground.vehicle.api.model.capability.AccessType extends java.lang.Enum<ai.pleos.playground.vehicle.api.model.capability.AccessType> {
+  public static final ai.pleos.playground.vehicle.api.model.capability.AccessType$Companion Companion;
+  public static final ai.pleos.playground.vehicle.api.model.capability.AccessType NONE;
+  public static final ai.pleos.playground.vehicle.api.model.capability.AccessType READ;
+  public static final ai.pleos.playground.vehicle.api.model.capability.AccessType WRITE;
+  public static final ai.pleos.playground.vehicle.api.model.capability.AccessType READ_WRITE;
+  public static ai.pleos.playground.vehicle.api.model.capability.AccessType[] values();
+  public static ai.pleos.playground.vehicle.api.model.capability.AccessType valueOf(java.lang.String);
+  public static kotlin.enums.EnumEntries<ai.pleos.playground.vehicle.api.model.capability.AccessType> getEntries();
+  public final int getId$Vehicle_release();
+}
+Compiled from "SourceFile"
+public final class ai.pleos.playground.vehicle.api.model.capability.AreaBounds<T> {
+  public ai.pleos.playground.vehicle.api.model.capability.AreaBounds(T, T);
+  public static ai.pleos.playground.vehicle.api.model.capability.AreaBounds copy$default(ai.pleos.playground.vehicle.api.model.capability.AreaBounds, java.lang.Object, java.lang.Object, int, java.lang.Object);
+  public final T getMinValue();
+  public final T getMaxValue();
+  public final T component1();
+  public final T component2();
+  public final ai.pleos.playground.vehicle.api.model.capability.AreaBounds<T> copy(T, T);
+  public java.lang.String toString();
+  public int hashCode();
+  public boolean equals(java.lang.Object);
+}
+Compiled from "SourceFile"
+public final class ai.pleos.playground.vehicle.api.model.capability.CapabilityConfig {
+  public ai.pleos.playground.vehicle.api.model.capability.CapabilityConfig(ai.pleos.playground.vehicle.api.model.capability.AccessType);
+  public ai.pleos.playground.vehicle.api.model.capability.CapabilityConfig(ai.pleos.playground.vehicle.api.model.capability.AccessType, int, kotlin.jvm.internal.DefaultConstructorMarker);
+  public static ai.pleos.playground.vehicle.api.model.capability.CapabilityConfig copy$default(ai.pleos.playground.vehicle.api.model.capability.CapabilityConfig, ai.pleos.playground.vehicle.api.model.capability.AccessType, int, java.lang.Object);
+  public ai.pleos.playground.vehicle.api.model.capability.CapabilityConfig();
+  public final ai.pleos.playground.vehicle.api.model.capability.AccessType getAccessType();
+  public final ai.pleos.playground.vehicle.api.model.capability.AccessType component1();
+  public final ai.pleos.playground.vehicle.api.model.capability.CapabilityConfig copy(ai.pleos.playground.vehicle.api.model.capability.AccessType);
+  public java.lang.String toString();
+  public int hashCode();
+  public boolean equals(java.lang.Object);
+}
+Compiled from "SourceFile"
+public final class ai.pleos.playground.vehicle.api.model.capability.HvacTemperatureConfigArray {
+  public ai.pleos.playground.vehicle.api.model.capability.HvacTemperatureConfigArray(float, float, float, float, float, float, java.util.List<java.lang.Integer>);
+  public static ai.pleos.playground.vehicle.api.model.capability.HvacTemperatureConfigArray copy$default(ai.pleos.playground.vehicle.api.model.capability.HvacTemperatureConfigArray, float, float, float, float, float, float, java.util.List, int, java.lang.Object);
+  public final float getMinCelsius();
+  public final float getMaxCelsius();
+  public final float getIncrementCelsius();
+  public final float getMinFahrenheit();
+  public final float getMaxFahrenheit();
+  public final float getIncrementFahrenheit();
+  public final java.util.List<java.lang.Integer> getRaw();
+  public final float component1();
+  public final float component2();
+  public final float component3();
+  public final float component4();
+  public final float component5();
+  public final float component6();
+  public final java.util.List<java.lang.Integer> component7();
+  public final ai.pleos.playground.vehicle.api.model.capability.HvacTemperatureConfigArray copy(float, float, float, float, float, float, java.util.List<java.lang.Integer>);
+  public java.lang.String toString();
+  public int hashCode();
+  public boolean equals(java.lang.Object);
+}
+Compiled from "SourceFile"
+public final class ai.pleos.playground.vehicle.api.model.capability.SmartGlassConfig {
+  public ai.pleos.playground.vehicle.api.model.capability.SmartGlassConfig(int, int);
+  public static ai.pleos.playground.vehicle.api.model.capability.SmartGlassConfig copy$default(ai.pleos.playground.vehicle.api.model.capability.SmartGlassConfig, int, int, int, java.lang.Object);
+  public final int getZoneCount();
+  public final int getLevelCount();
+  public final int component1();
+  public final int component2();
+  public final ai.pleos.playground.vehicle.api.model.capability.SmartGlassConfig copy(int, int);
+  public java.lang.String toString();
+  public int hashCode();
+  public boolean equals(java.lang.Object);
+}
+Compiled from "SourceFile"
+public final class ai.pleos.playground.vehicle.constant.Constants {
+  public static final ai.pleos.playground.vehicle.constant.Constants INSTANCE;
+  public static final java.lang.String VEHICLE_SERVICE_PACKAGE_NAME;
+  public static final java.lang.String VEHICLE_SERVICE_NAME;
+  public static final java.lang.String VEHICLE_ACTION;
+}
+Compiled from "SourceFile"
+public final class ai.pleos.playground.vehicle.constant.PleosPermission {
+  public static final ai.pleos.playground.vehicle.constant.PleosPermission INSTANCE;
+  public static final java.lang.String CONTROL_CAR_CLIMATE;
+  public static final java.lang.String CONTROL_CAR_DOORS;
+  public static final java.lang.String CONTROL_CAR_ENERGY;
+  public static final java.lang.String CONTROL_CAR_MIRRORS;
+  public static final java.lang.String CONTROL_CAR_SEATS;
+  public static final java.lang.String CONTROL_CAR_WINDOWS;
+  public static final java.lang.String CONTROL_CAR_INFO;
+  public static final java.lang.String CONTROL_CAR_TOLL;
+  public static final java.lang.String CONTROL_CAR_DRIVE;
+  public static final java.lang.String CONTROL_CAR_LIGHTS;
+  public static final java.lang.String CONTROL_CAR_SAFETY;
+  public static final java.lang.String CAR_ENERGY;
+  public static final java.lang.String CAR_INFO;
+  public static final java.lang.String CAR_TOLL;
+  public static final java.lang.String CAR_DRIVE;
+  public static final java.lang.String CAR_LIGHTS;
+  public static final java.lang.String CAR_SAFETY;
+  public static final java.lang.String CAR_SEATS;
+  public static final java.lang.String CAR_CLIMATE;
+  public static final java.lang.String CAR_WINDOWS;
+  public static final java.lang.String CAR_DOORS;
+  public static final java.lang.String CAR_MIRRORS;
+  public static final java.lang.String PRIVATE_CAR_CLIMATE;
+  public static final java.lang.String PRIVATE_CAR_DOORS;
+  public static final java.lang.String PRIVATE_CAR_ENERGY;
+  public static final java.lang.String PRIVATE_CAR_MIRRORS;
+  public static final java.lang.String PRIVATE_CAR_SEATS;
+  public static final java.lang.String PRIVATE_CAR_WINDOWS;
+  public static final java.lang.String PRIVATE_CAR_INFO;
+  public static final java.lang.String PRIVATE_CAR_TOLL;
+  public static final java.lang.String PRIVATE_CAR_DRIVE;
+  public static final java.lang.String PRIVATE_CAR_LIGHTS;
+  public static final java.lang.String PRIVATE_CAR_SAFETY;
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.constant.area.AreaValue {
+  public abstract int getId();
+}
+Compiled from "SourceFile"
+public final class ai.pleos.playground.vehicle.constant.area.DoorValue extends java.lang.Enum<ai.pleos.playground.vehicle.constant.area.DoorValue> implements ai.pleos.playground.vehicle.constant.area.AreaValue {
+  public static final ai.pleos.playground.vehicle.constant.area.DoorValue ROW_1_LEFT;
+  public static final ai.pleos.playground.vehicle.constant.area.DoorValue ROW_1_RIGHT;
+  public static final ai.pleos.playground.vehicle.constant.area.DoorValue ROW_2_LEFT;
+  public static final ai.pleos.playground.vehicle.constant.area.DoorValue ROW_2_RIGHT;
+  public static final ai.pleos.playground.vehicle.constant.area.DoorValue ROW_3_LEFT;
+  public static final ai.pleos.playground.vehicle.constant.area.DoorValue ROW_3_RIGHT;
+  public static final ai.pleos.playground.vehicle.constant.area.DoorValue HOOD;
+  public static final ai.pleos.playground.vehicle.constant.area.DoorValue REAR;
+  public static ai.pleos.playground.vehicle.constant.area.DoorValue[] values();
+  public static ai.pleos.playground.vehicle.constant.area.DoorValue valueOf(java.lang.String);
+  public static kotlin.enums.EnumEntries<ai.pleos.playground.vehicle.constant.area.DoorValue> getEntries();
+  public int getId();
+}
+Compiled from "SourceFile"
+public final class ai.pleos.playground.vehicle.constant.area.MirrorValue extends java.lang.Enum<ai.pleos.playground.vehicle.constant.area.MirrorValue> implements ai.pleos.playground.vehicle.constant.area.AreaValue {
+  public static final ai.pleos.playground.vehicle.constant.area.MirrorValue DRIVER_LEFT;
+  public static final ai.pleos.playground.vehicle.constant.area.MirrorValue DRIVER_RIGHT;
+  public static final ai.pleos.playground.vehicle.constant.area.MirrorValue DRIVER_CENTER;
+  public static ai.pleos.playground.vehicle.constant.area.MirrorValue[] values();
+  public static ai.pleos.playground.vehicle.constant.area.MirrorValue valueOf(java.lang.String);
+  public static kotlin.enums.EnumEntries<ai.pleos.playground.vehicle.constant.area.MirrorValue> getEntries();
+  public int getId();
+}
+Compiled from "SourceFile"
+public final class ai.pleos.playground.vehicle.constant.area.SeatValue extends java.lang.Enum<ai.pleos.playground.vehicle.constant.area.SeatValue> implements ai.pleos.playground.vehicle.constant.area.AreaValue {
+  public static final ai.pleos.playground.vehicle.constant.area.SeatValue ROW_1_LEFT;
+  public static final ai.pleos.playground.vehicle.constant.area.SeatValue ROW_1_CENTER;
+  public static final ai.pleos.playground.vehicle.constant.area.SeatValue ROW_1_RIGHT;
+  public static final ai.pleos.playground.vehicle.constant.area.SeatValue ROW_2_LEFT;
+  public static final ai.pleos.playground.vehicle.constant.area.SeatValue ROW_2_CENTER;
+  public static final ai.pleos.playground.vehicle.constant.area.SeatValue ROW_2_RIGHT;
+  public static final ai.pleos.playground.vehicle.constant.area.SeatValue ROW_3_LEFT;
+  public static final ai.pleos.playground.vehicle.constant.area.SeatValue ROW_3_CENTER;
+  public static final ai.pleos.playground.vehicle.constant.area.SeatValue ROW_3_RIGHT;
+  public static ai.pleos.playground.vehicle.constant.area.SeatValue[] values();
+  public static ai.pleos.playground.vehicle.constant.area.SeatValue valueOf(java.lang.String);
+  public static kotlin.enums.EnumEntries<ai.pleos.playground.vehicle.constant.area.SeatValue> getEntries();
+  public int getId();
+}
+Compiled from "SourceFile"
+public final class ai.pleos.playground.vehicle.constant.area.TurnSignalValue extends java.lang.Enum<ai.pleos.playground.vehicle.constant.area.TurnSignalValue> implements ai.pleos.playground.vehicle.constant.area.AreaValue {
+  public static final ai.pleos.playground.vehicle.constant.area.TurnSignalValue$Companion Companion;
+  public static final ai.pleos.playground.vehicle.constant.area.TurnSignalValue OFF;
+  public static final ai.pleos.playground.vehicle.constant.area.TurnSignalValue RIGHT;
+  public static final ai.pleos.playground.vehicle.constant.area.TurnSignalValue LEFT;
+  public static ai.pleos.playground.vehicle.constant.area.TurnSignalValue[] values();
+  public static ai.pleos.playground.vehicle.constant.area.TurnSignalValue valueOf(java.lang.String);
+  public static kotlin.enums.EnumEntries<ai.pleos.playground.vehicle.constant.area.TurnSignalValue> getEntries();
+  public int getId();
+}
+Compiled from "SourceFile"
+public final class ai.pleos.playground.vehicle.constant.area.WheelValue extends java.lang.Enum<ai.pleos.playground.vehicle.constant.area.WheelValue> implements ai.pleos.playground.vehicle.constant.area.AreaValue {
+  public static final ai.pleos.playground.vehicle.constant.area.WheelValue UNKNOWN;
+  public static final ai.pleos.playground.vehicle.constant.area.WheelValue LEFT_FRONT;
+  public static final ai.pleos.playground.vehicle.constant.area.WheelValue RIGHT_FRONT;
+  public static final ai.pleos.playground.vehicle.constant.area.WheelValue LEFT_REAR;
+  public static final ai.pleos.playground.vehicle.constant.area.WheelValue RIGHT_REAR;
+  public static ai.pleos.playground.vehicle.constant.area.WheelValue[] values();
+  public static ai.pleos.playground.vehicle.constant.area.WheelValue valueOf(java.lang.String);
+  public static kotlin.enums.EnumEntries<ai.pleos.playground.vehicle.constant.area.WheelValue> getEntries();
+  public int getId();
+}
+Compiled from "SourceFile"
+public final class ai.pleos.playground.vehicle.constant.area.WindowValue extends java.lang.Enum<ai.pleos.playground.vehicle.constant.area.WindowValue> implements ai.pleos.playground.vehicle.constant.area.AreaValue {
+  public static final ai.pleos.playground.vehicle.constant.area.WindowValue FRONT_WINDSHIELD;
+  public static final ai.pleos.playground.vehicle.constant.area.WindowValue REAR_WINDSHIELD;
+  public static final ai.pleos.playground.vehicle.constant.area.WindowValue ROW_1_LEFT;
+  public static final ai.pleos.playground.vehicle.constant.area.WindowValue ROW_1_RIGHT;
+  public static final ai.pleos.playground.vehicle.constant.area.WindowValue ROW_2_LEFT;
+  public static final ai.pleos.playground.vehicle.constant.area.WindowValue ROW_2_RIGHT;
+  public static final ai.pleos.playground.vehicle.constant.area.WindowValue ROOF_TOP_1;
+  public static final ai.pleos.playground.vehicle.constant.area.WindowValue ROOF_TOP_2;
+  public static ai.pleos.playground.vehicle.constant.area.WindowValue[] values();
+  public static ai.pleos.playground.vehicle.constant.area.WindowValue valueOf(java.lang.String);
+  public static kotlin.enums.EnumEntries<ai.pleos.playground.vehicle.constant.area.WindowValue> getEntries();
+  public int getId();
+}
+Compiled from "SourceFile"
+public final class ai.pleos.playground.vehicle.constant.control.CapabilityType extends java.lang.Enum<ai.pleos.playground.vehicle.constant.control.CapabilityType> {
+  public static final ai.pleos.playground.vehicle.constant.control.CapabilityType$Companion Companion;
+  public static final ai.pleos.playground.vehicle.constant.control.CapabilityType SUNROOF;
+  public static final ai.pleos.playground.vehicle.constant.control.CapabilityType AMBIENT_LIGHT;
+  public static ai.pleos.playground.vehicle.constant.control.CapabilityType[] values();
+  public static ai.pleos.playground.vehicle.constant.control.CapabilityType valueOf(java.lang.String);
+  public static kotlin.enums.EnumEntries<ai.pleos.playground.vehicle.constant.control.CapabilityType> getEntries();
+  public final int getId$Vehicle_release();
+}
+Compiled from "SourceFile"
+public final class ai.pleos.playground.vehicle.constant.control.CruiseControl extends java.lang.Enum<ai.pleos.playground.vehicle.constant.control.CruiseControl> {
+  public static final ai.pleos.playground.vehicle.constant.control.CruiseControl$Companion Companion;
+  public static final ai.pleos.playground.vehicle.constant.control.CruiseControl OTHER;
+  public static final ai.pleos.playground.vehicle.constant.control.CruiseControl ENABLED;
+  public static final ai.pleos.playground.vehicle.constant.control.CruiseControl ACTIVATED;
+  public static final ai.pleos.playground.vehicle.constant.control.CruiseControl USER_OVERRIDE;
+  public static final ai.pleos.playground.vehicle.constant.control.CruiseControl SUSPENDED;
+  public static final ai.pleos.playground.vehicle.constant.control.CruiseControl FORCED_DEACTIVATION_WARNING;
+  public static ai.pleos.playground.vehicle.constant.control.CruiseControl[] values();
+  public static ai.pleos.playground.vehicle.constant.control.CruiseControl valueOf(java.lang.String);
+  public static kotlin.enums.EnumEntries<ai.pleos.playground.vehicle.constant.control.CruiseControl> getEntries();
+  public final int getId$Vehicle_release();
+}
+Compiled from "SourceFile"
+public final class ai.pleos.playground.vehicle.constant.control.DrivingModeType extends java.lang.Enum<ai.pleos.playground.vehicle.constant.control.DrivingModeType> {
+  public static final ai.pleos.playground.vehicle.constant.control.DrivingModeType$Companion Companion;
+  public static final ai.pleos.playground.vehicle.constant.control.DrivingModeType NORMAL;
+  public static final ai.pleos.playground.vehicle.constant.control.DrivingModeType ECO;
+  public static final ai.pleos.playground.vehicle.constant.control.DrivingModeType SPORT;
+  public static ai.pleos.playground.vehicle.constant.control.DrivingModeType[] values();
+  public static ai.pleos.playground.vehicle.constant.control.DrivingModeType valueOf(java.lang.String);
+  public static kotlin.enums.EnumEntries<ai.pleos.playground.vehicle.constant.control.DrivingModeType> getEntries();
+  public final int getId$Vehicle_release();
+}
+Compiled from "SourceFile"
+public final class ai.pleos.playground.vehicle.constant.control.EvChargeState extends java.lang.Enum<ai.pleos.playground.vehicle.constant.control.EvChargeState> {
+  public static final ai.pleos.playground.vehicle.constant.control.EvChargeState$Companion Companion;
+  public static final ai.pleos.playground.vehicle.constant.control.EvChargeState UNKNOWN;
+  public static final ai.pleos.playground.vehicle.constant.control.EvChargeState CHARGING;
+  public static final ai.pleos.playground.vehicle.constant.control.EvChargeState FULLY_CHARGED;
+  public static final ai.pleos.playground.vehicle.constant.control.EvChargeState NOT_CHARGING;
+  public static final ai.pleos.playground.vehicle.constant.control.EvChargeState ERROR;
+  public static ai.pleos.playground.vehicle.constant.control.EvChargeState[] values();
+  public static ai.pleos.playground.vehicle.constant.control.EvChargeState valueOf(java.lang.String);
+  public static kotlin.enums.EnumEntries<ai.pleos.playground.vehicle.constant.control.EvChargeState> getEntries();
+  public final int getId$Vehicle_release();
+}
+Compiled from "SourceFile"
+public final class ai.pleos.playground.vehicle.constant.control.EvConnectorType extends java.lang.Enum<ai.pleos.playground.vehicle.constant.control.EvConnectorType> {
+  public static final ai.pleos.playground.vehicle.constant.control.EvConnectorType$Companion Companion;
+  public static final ai.pleos.playground.vehicle.constant.control.EvConnectorType UNKNOWN;
+  public static final ai.pleos.playground.vehicle.constant.control.EvConnectorType IEC_TYPE_1_AC;
+  public static final ai.pleos.playground.vehicle.constant.control.EvConnectorType IEC_TYPE_2_AC;
+  public static final ai.pleos.playground.vehicle.constant.control.EvConnectorType IEC_TYPE_3_AC;
+  public static final ai.pleos.playground.vehicle.constant.control.EvConnectorType IEC_TYPE_4_DC;
+  public static final ai.pleos.playground.vehicle.constant.control.EvConnectorType IEC_TYPE_1_CCS_DC;
+  public static final ai.pleos.playground.vehicle.constant.control.EvConnectorType IEC_TYPE_2_CCS_DC;
+  public static final ai.pleos.playground.vehicle.constant.control.EvConnectorType TESLA_ROADSTER;
+  public static final ai.pleos.playground.vehicle.constant.control.EvConnectorType TESLA_HPWC;
+  public static final ai.pleos.playground.vehicle.constant.control.EvConnectorType TESLA_SUPERCHARGER;
+  public static final ai.pleos.playground.vehicle.constant.control.EvConnectorType GBT_AC;
+  public static final ai.pleos.playground.vehicle.constant.control.EvConnectorType GBT_DC;
+  public static final ai.pleos.playground.vehicle.constant.control.EvConnectorType OTHER;
+  public static ai.pleos.playground.vehicle.constant.control.EvConnectorType[] values();
+  public static ai.pleos.playground.vehicle.constant.control.EvConnectorType valueOf(java.lang.String);
+  public static kotlin.enums.EnumEntries<ai.pleos.playground.vehicle.constant.control.EvConnectorType> getEntries();
+  public final int getId$Vehicle_release();
+}
+Compiled from "SourceFile"
+public final class ai.pleos.playground.vehicle.constant.control.EvRegenerativeBrakingState extends java.lang.Enum<ai.pleos.playground.vehicle.constant.control.EvRegenerativeBrakingState> {
+  public static final ai.pleos.playground.vehicle.constant.control.EvRegenerativeBrakingState$Companion Companion;
+  public static final ai.pleos.playground.vehicle.constant.control.EvRegenerativeBrakingState UNKNOWN;
+  public static final ai.pleos.playground.vehicle.constant.control.EvRegenerativeBrakingState DISABLED;
+  public static final ai.pleos.playground.vehicle.constant.control.EvRegenerativeBrakingState PARTIALLY_ENABLED;
+  public static final ai.pleos.playground.vehicle.constant.control.EvRegenerativeBrakingState FULLY_ENABLED;
+  public static ai.pleos.playground.vehicle.constant.control.EvRegenerativeBrakingState[] values();
+  public static ai.pleos.playground.vehicle.constant.control.EvRegenerativeBrakingState valueOf(java.lang.String);
+  public static kotlin.enums.EnumEntries<ai.pleos.playground.vehicle.constant.control.EvRegenerativeBrakingState> getEntries();
+  public final int getId$Vehicle_release();
+}
+Compiled from "SourceFile"
+public final class ai.pleos.playground.vehicle.constant.control.FanDirectionType extends java.lang.Enum<ai.pleos.playground.vehicle.constant.control.FanDirectionType> {
+  public static final ai.pleos.playground.vehicle.constant.control.FanDirectionType$Companion Companion;
+  public static final ai.pleos.playground.vehicle.constant.control.FanDirectionType UNKNOWN;
+  public static final ai.pleos.playground.vehicle.constant.control.FanDirectionType FACE;
+  public static final ai.pleos.playground.vehicle.constant.control.FanDirectionType FLOOR;
+  public static final ai.pleos.playground.vehicle.constant.control.FanDirectionType FACE_AND_FLOOR;
+  public static final ai.pleos.playground.vehicle.constant.control.FanDirectionType DEFROST;
+  public static final ai.pleos.playground.vehicle.constant.control.FanDirectionType FACE_AND_DEFROST;
+  public static final ai.pleos.playground.vehicle.constant.control.FanDirectionType DEFROST_AND_FLOOR;
+  public static final ai.pleos.playground.vehicle.constant.control.FanDirectionType FACE_AND_FLOOR_AND_DEFROST;
+  public static ai.pleos.playground.vehicle.constant.control.FanDirectionType[] values();
+  public static ai.pleos.playground.vehicle.constant.control.FanDirectionType valueOf(java.lang.String);
+  public static kotlin.enums.EnumEntries<ai.pleos.playground.vehicle.constant.control.FanDirectionType> getEntries();
+  public final int getId$Vehicle_release();
+}
+Compiled from "SourceFile"
+public final class ai.pleos.playground.vehicle.constant.control.FuelType extends java.lang.Enum<ai.pleos.playground.vehicle.constant.control.FuelType> {
+  public static final ai.pleos.playground.vehicle.constant.control.FuelType$Companion Companion;
+  public static final ai.pleos.playground.vehicle.constant.control.FuelType BIODIESEL;
+  public static final ai.pleos.playground.vehicle.constant.control.FuelType CNG;
+  public static final ai.pleos.playground.vehicle.constant.control.FuelType DIESEL_1;
+  public static final ai.pleos.playground.vehicle.constant.control.FuelType DIESEL_2;
+  public static final ai.pleos.playground.vehicle.constant.control.FuelType E85;
+  public static final ai.pleos.playground.vehicle.constant.control.FuelType ELECTRIC;
+  public static final ai.pleos.playground.vehicle.constant.control.FuelType HYDROGEN;
+  public static final ai.pleos.playground.vehicle.constant.control.FuelType LEADED;
+  public static final ai.pleos.playground.vehicle.constant.control.FuelType LNG;
+  public static final ai.pleos.playground.vehicle.constant.control.FuelType LPG;
+  public static final ai.pleos.playground.vehicle.constant.control.FuelType OTHER;
+  public static final ai.pleos.playground.vehicle.constant.control.FuelType UNKNOWN;
+  public static final ai.pleos.playground.vehicle.constant.control.FuelType UNLEADED;
+  public static ai.pleos.playground.vehicle.constant.control.FuelType[] values();
+  public static ai.pleos.playground.vehicle.constant.control.FuelType valueOf(java.lang.String);
+  public static kotlin.enums.EnumEntries<ai.pleos.playground.vehicle.constant.control.FuelType> getEntries();
+  public final int getId$Vehicle_release();
+}
+Compiled from "SourceFile"
+public final class ai.pleos.playground.vehicle.constant.control.GsrComplianceType extends java.lang.Enum<ai.pleos.playground.vehicle.constant.control.GsrComplianceType> {
+  public static final ai.pleos.playground.vehicle.constant.control.GsrComplianceType$Companion Companion;
+  public static final ai.pleos.playground.vehicle.constant.control.GsrComplianceType GSR_COMPLIANCE_TYPE_NOT_REQUIRED;
+  public static final ai.pleos.playground.vehicle.constant.control.GsrComplianceType GSR_COMPLIANCE_TYPE_REQUIRED_V1;
+  public static ai.pleos.playground.vehicle.constant.control.GsrComplianceType[] values();
+  public static ai.pleos.playground.vehicle.constant.control.GsrComplianceType valueOf(java.lang.String);
+  public static kotlin.enums.EnumEntries<ai.pleos.playground.vehicle.constant.control.GsrComplianceType> getEntries();
+  public final int getId$Vehicle_release();
+}
+Compiled from "SourceFile"
+public final class ai.pleos.playground.vehicle.constant.control.IgnitionState extends java.lang.Enum<ai.pleos.playground.vehicle.constant.control.IgnitionState> {
+  public static final ai.pleos.playground.vehicle.constant.control.IgnitionState$Companion Companion;
+  public static final ai.pleos.playground.vehicle.constant.control.IgnitionState UNDEFINED;
+  public static final ai.pleos.playground.vehicle.constant.control.IgnitionState LOCK;
+  public static final ai.pleos.playground.vehicle.constant.control.IgnitionState OFF;
+  public static final ai.pleos.playground.vehicle.constant.control.IgnitionState ACC;
+  public static final ai.pleos.playground.vehicle.constant.control.IgnitionState ON;
+  public static final ai.pleos.playground.vehicle.constant.control.IgnitionState START;
+  public static ai.pleos.playground.vehicle.constant.control.IgnitionState[] values();
+  public static ai.pleos.playground.vehicle.constant.control.IgnitionState valueOf(java.lang.String);
+  public static kotlin.enums.EnumEntries<ai.pleos.playground.vehicle.constant.control.IgnitionState> getEntries();
+  public final int getId$Vehicle_release();
+}
+Compiled from "SourceFile"
+public final class ai.pleos.playground.vehicle.constant.control.LightState extends java.lang.Enum<ai.pleos.playground.vehicle.constant.control.LightState> {
+  public static final ai.pleos.playground.vehicle.constant.control.LightState$Companion Companion;
+  public static final ai.pleos.playground.vehicle.constant.control.LightState OFF;
+  public static final ai.pleos.playground.vehicle.constant.control.LightState ON;
+  public static final ai.pleos.playground.vehicle.constant.control.LightState DAYTIME_RUNNING;
+  public static ai.pleos.playground.vehicle.constant.control.LightState[] values();
+  public static ai.pleos.playground.vehicle.constant.control.LightState valueOf(java.lang.String);
+  public static kotlin.enums.EnumEntries<ai.pleos.playground.vehicle.constant.control.LightState> getEntries();
+  public final int getId$Vehicle_release();
+}
+Compiled from "SourceFile"
+public final class ai.pleos.playground.vehicle.constant.control.LightSwitch extends java.lang.Enum<ai.pleos.playground.vehicle.constant.control.LightSwitch> {
+  public static final ai.pleos.playground.vehicle.constant.control.LightSwitch$Companion Companion;
+  public static final ai.pleos.playground.vehicle.constant.control.LightSwitch OFF;
+  public static final ai.pleos.playground.vehicle.constant.control.LightSwitch ON;
+  public static final ai.pleos.playground.vehicle.constant.control.LightSwitch DAYTIME_RUNNING;
+  public static final ai.pleos.playground.vehicle.constant.control.LightSwitch AUTOMATIC;
+  public static ai.pleos.playground.vehicle.constant.control.LightSwitch[] values();
+  public static ai.pleos.playground.vehicle.constant.control.LightSwitch valueOf(java.lang.String);
+  public static kotlin.enums.EnumEntries<ai.pleos.playground.vehicle.constant.control.LightSwitch> getEntries();
+  public final int getId$Vehicle_release();
+}
+Compiled from "SourceFile"
+public final class ai.pleos.playground.vehicle.constant.control.MoveControl extends java.lang.Enum<ai.pleos.playground.vehicle.constant.control.MoveControl> {
+  public static final ai.pleos.playground.vehicle.constant.control.MoveControl$Companion Companion;
+  public static final ai.pleos.playground.vehicle.constant.control.MoveControl BACKWARD;
+  public static final ai.pleos.playground.vehicle.constant.control.MoveControl STOP;
+  public static final ai.pleos.playground.vehicle.constant.control.MoveControl FORWARD;
+  public static ai.pleos.playground.vehicle.constant.control.MoveControl[] values();
+  public static ai.pleos.playground.vehicle.constant.control.MoveControl valueOf(java.lang.String);
+  public static kotlin.enums.EnumEntries<ai.pleos.playground.vehicle.constant.control.MoveControl> getEntries();
+  public final int getId$Vehicle_release();
+}
+Compiled from "SourceFile"
+public final class ai.pleos.playground.vehicle.constant.control.OilLevelState extends java.lang.Enum<ai.pleos.playground.vehicle.constant.control.OilLevelState> {
+  public static final ai.pleos.playground.vehicle.constant.control.OilLevelState$Companion Companion;
+  public static final ai.pleos.playground.vehicle.constant.control.OilLevelState LOW;
+  public static final ai.pleos.playground.vehicle.constant.control.OilLevelState HIGH;
+  public static final ai.pleos.playground.vehicle.constant.control.OilLevelState NORMAL;
+  public static final ai.pleos.playground.vehicle.constant.control.OilLevelState ERROR;
+  public static final ai.pleos.playground.vehicle.constant.control.OilLevelState CRITICALLY_LOW;
+  public static ai.pleos.playground.vehicle.constant.control.OilLevelState[] values();
+  public static ai.pleos.playground.vehicle.constant.control.OilLevelState valueOf(java.lang.String);
+  public static kotlin.enums.EnumEntries<ai.pleos.playground.vehicle.constant.control.OilLevelState> getEntries();
+  public final int getId$Vehicle_release();
+}
+Compiled from "SourceFile"
+public final class ai.pleos.playground.vehicle.constant.control.PortLocationType extends java.lang.Enum<ai.pleos.playground.vehicle.constant.control.PortLocationType> {
+  public static final ai.pleos.playground.vehicle.constant.control.PortLocationType$Companion Companion;
+  public static final ai.pleos.playground.vehicle.constant.control.PortLocationType UNKNOWN;
+  public static final ai.pleos.playground.vehicle.constant.control.PortLocationType FRONT_LEFT;
+  public static final ai.pleos.playground.vehicle.constant.control.PortLocationType FRONT_RIGHT;
+  public static final ai.pleos.playground.vehicle.constant.control.PortLocationType REAR_RIGHT;
+  public static final ai.pleos.playground.vehicle.constant.control.PortLocationType REAR_LEFT;
+  public static final ai.pleos.playground.vehicle.constant.control.PortLocationType FRONT;
+  public static final ai.pleos.playground.vehicle.constant.control.PortLocationType REAR;
+  public static ai.pleos.playground.vehicle.constant.control.PortLocationType[] values();
+  public static ai.pleos.playground.vehicle.constant.control.PortLocationType valueOf(java.lang.String);
+  public static kotlin.enums.EnumEntries<ai.pleos.playground.vehicle.constant.control.PortLocationType> getEntries();
+  public final int getId$Vehicle_release();
+}
+Compiled from "SourceFile"
+public final class ai.pleos.playground.vehicle.constant.control.SmartGlassZoneCommand extends java.lang.Enum<ai.pleos.playground.vehicle.constant.control.SmartGlassZoneCommand> {
+  public static final ai.pleos.playground.vehicle.constant.control.SmartGlassZoneCommand SKIP;
+  public static final ai.pleos.playground.vehicle.constant.control.SmartGlassZoneCommand OFF;
+  public static final ai.pleos.playground.vehicle.constant.control.SmartGlassZoneCommand ON;
+  public static ai.pleos.playground.vehicle.constant.control.SmartGlassZoneCommand[] values();
+  public static ai.pleos.playground.vehicle.constant.control.SmartGlassZoneCommand valueOf(java.lang.String);
+  public static kotlin.enums.EnumEntries<ai.pleos.playground.vehicle.constant.control.SmartGlassZoneCommand> getEntries();
+  public final int getId$Vehicle_release();
+}
+Compiled from "SourceFile"
+public final class ai.pleos.playground.vehicle.constant.control.SteeringControl extends java.lang.Enum<ai.pleos.playground.vehicle.constant.control.SteeringControl> {
+  public static final ai.pleos.playground.vehicle.constant.control.SteeringControl$Companion Companion;
+  public static final ai.pleos.playground.vehicle.constant.control.SteeringControl OFF;
+  public static final ai.pleos.playground.vehicle.constant.control.SteeringControl READY;
+  public static final ai.pleos.playground.vehicle.constant.control.SteeringControl ACTIVE;
+  public static ai.pleos.playground.vehicle.constant.control.SteeringControl[] values();
+  public static ai.pleos.playground.vehicle.constant.control.SteeringControl valueOf(java.lang.String);
+  public static kotlin.enums.EnumEntries<ai.pleos.playground.vehicle.constant.control.SteeringControl> getEntries();
+  public final int getId$Vehicle_release();
+}
+Compiled from "SourceFile"
+public final class ai.pleos.playground.vehicle.constant.control.TripStatisticType extends java.lang.Enum<ai.pleos.playground.vehicle.constant.control.TripStatisticType> {
+  public static final ai.pleos.playground.vehicle.constant.control.TripStatisticType$Companion Companion;
+  public static final ai.pleos.playground.vehicle.constant.control.TripStatisticType CURRENT;
+  public static final ai.pleos.playground.vehicle.constant.control.TripStatisticType INSTANTANEOUS;
+  public static final ai.pleos.playground.vehicle.constant.control.TripStatisticType CUMULATIVE;
+  public static final ai.pleos.playground.vehicle.constant.control.TripStatisticType SINCE_REFILL;
+  public static ai.pleos.playground.vehicle.constant.control.TripStatisticType[] values();
+  public static ai.pleos.playground.vehicle.constant.control.TripStatisticType valueOf(java.lang.String);
+  public static kotlin.enums.EnumEntries<ai.pleos.playground.vehicle.constant.control.TripStatisticType> getEntries();
+  public final int getId();
+}
+Compiled from "SourceFile"
+public final class ai.pleos.playground.vehicle.constant.control.VehicleGear extends java.lang.Enum<ai.pleos.playground.vehicle.constant.control.VehicleGear> {
+  public static final ai.pleos.playground.vehicle.constant.control.VehicleGear$Companion Companion;
+  public static final ai.pleos.playground.vehicle.constant.control.VehicleGear GEAR_UNKNOWN;
+  public static final ai.pleos.playground.vehicle.constant.control.VehicleGear GEAR_NEUTRAL;
+  public static final ai.pleos.playground.vehicle.constant.control.VehicleGear GEAR_REVERSE;
+  public static final ai.pleos.playground.vehicle.constant.control.VehicleGear GEAR_PARK;
+  public static final ai.pleos.playground.vehicle.constant.control.VehicleGear GEAR_DRIVE;
+  public static final ai.pleos.playground.vehicle.constant.control.VehicleGear GEAR_1;
+  public static final ai.pleos.playground.vehicle.constant.control.VehicleGear GEAR_2;
+  public static final ai.pleos.playground.vehicle.constant.control.VehicleGear GEAR_3;
+  public static final ai.pleos.playground.vehicle.constant.control.VehicleGear GEAR_4;
+  public static final ai.pleos.playground.vehicle.constant.control.VehicleGear GEAR_5;
+  public static final ai.pleos.playground.vehicle.constant.control.VehicleGear GEAR_6;
+  public static final ai.pleos.playground.vehicle.constant.control.VehicleGear GEAR_7;
+  public static final ai.pleos.playground.vehicle.constant.control.VehicleGear GEAR_8;
+  public static final ai.pleos.playground.vehicle.constant.control.VehicleGear GEAR_9;
+  public static ai.pleos.playground.vehicle.constant.control.VehicleGear[] values();
+  public static ai.pleos.playground.vehicle.constant.control.VehicleGear valueOf(java.lang.String);
+  public static kotlin.enums.EnumEntries<ai.pleos.playground.vehicle.constant.control.VehicleGear> getEntries();
+  public final int getId$Vehicle_release();
+}
+Compiled from "SourceFile"
+public final class ai.pleos.playground.vehicle.constant.control.WiperState extends java.lang.Enum<ai.pleos.playground.vehicle.constant.control.WiperState> {
+  public static final ai.pleos.playground.vehicle.constant.control.WiperState$Companion Companion;
+  public static final ai.pleos.playground.vehicle.constant.control.WiperState OTHER;
+  public static final ai.pleos.playground.vehicle.constant.control.WiperState OFF;
+  public static final ai.pleos.playground.vehicle.constant.control.WiperState ON;
+  public static final ai.pleos.playground.vehicle.constant.control.WiperState SERVICE;
+  public static ai.pleos.playground.vehicle.constant.control.WiperState[] values();
+  public static ai.pleos.playground.vehicle.constant.control.WiperState valueOf(java.lang.String);
+  public static kotlin.enums.EnumEntries<ai.pleos.playground.vehicle.constant.control.WiperState> getEntries();
+  public final int getId$Vehicle_release();
+}
+Compiled from "SourceFile"
+public final class ai.pleos.playground.vehicle.constant.control.WiperSwitch extends java.lang.Enum<ai.pleos.playground.vehicle.constant.control.WiperSwitch> {
+  public static final ai.pleos.playground.vehicle.constant.control.WiperSwitch$Companion Companion;
+  public static final ai.pleos.playground.vehicle.constant.control.WiperSwitch OTHER;
+  public static final ai.pleos.playground.vehicle.constant.control.WiperSwitch OFF;
+  public static final ai.pleos.playground.vehicle.constant.control.WiperSwitch MIST;
+  public static final ai.pleos.playground.vehicle.constant.control.WiperSwitch INTERMITTENT_LEVEL_1;
+  public static final ai.pleos.playground.vehicle.constant.control.WiperSwitch INTERMITTENT_LEVEL_2;
+  public static final ai.pleos.playground.vehicle.constant.control.WiperSwitch INTERMITTENT_LEVEL_3;
+  public static final ai.pleos.playground.vehicle.constant.control.WiperSwitch INTERMITTENT_LEVEL_4;
+  public static final ai.pleos.playground.vehicle.constant.control.WiperSwitch INTERMITTENT_LEVEL_5;
+  public static final ai.pleos.playground.vehicle.constant.control.WiperSwitch CONTINUOUS_LEVEL_1;
+  public static final ai.pleos.playground.vehicle.constant.control.WiperSwitch CONTINUOUS_LEVEL_2;
+  public static final ai.pleos.playground.vehicle.constant.control.WiperSwitch CONTINUOUS_LEVEL_3;
+  public static final ai.pleos.playground.vehicle.constant.control.WiperSwitch CONTINUOUS_LEVEL_4;
+  public static final ai.pleos.playground.vehicle.constant.control.WiperSwitch CONTINUOUS_LEVEL_5;
+  public static final ai.pleos.playground.vehicle.constant.control.WiperSwitch AUTO;
+  public static final ai.pleos.playground.vehicle.constant.control.WiperSwitch SERVICE;
+  public static ai.pleos.playground.vehicle.constant.control.WiperSwitch[] values();
+  public static ai.pleos.playground.vehicle.constant.control.WiperSwitch valueOf(java.lang.String);
+  public static kotlin.enums.EnumEntries<ai.pleos.playground.vehicle.constant.control.WiperSwitch> getEntries();
+  public final int getId$Vehicle_release();
+}
+Compiled from "SourceFile"
+public final class ai.pleos.playground.vehicle.constant.telltale.TelltaleColor extends java.lang.Enum<ai.pleos.playground.vehicle.constant.telltale.TelltaleColor> {
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleColor$Companion Companion;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleColor WHITE;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleColor GREEN;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleColor BLUE;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleColor YELLOW;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleColor RED;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleColor GRAY;
+  public static ai.pleos.playground.vehicle.constant.telltale.TelltaleColor[] values();
+  public static ai.pleos.playground.vehicle.constant.telltale.TelltaleColor valueOf(java.lang.String);
+  public static kotlin.enums.EnumEntries<ai.pleos.playground.vehicle.constant.telltale.TelltaleColor> getEntries();
+  public final int getId$Vehicle_release();
+}
+Compiled from "SourceFile"
+public final class ai.pleos.playground.vehicle.constant.telltale.TelltaleState extends java.lang.Enum<ai.pleos.playground.vehicle.constant.telltale.TelltaleState> {
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleState$Companion Companion;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleState OFF;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleState ON;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleState BLINK;
+  public static ai.pleos.playground.vehicle.constant.telltale.TelltaleState[] values();
+  public static ai.pleos.playground.vehicle.constant.telltale.TelltaleState valueOf(java.lang.String);
+  public static kotlin.enums.EnumEntries<ai.pleos.playground.vehicle.constant.telltale.TelltaleState> getEntries();
+  public final int getId$Vehicle_release();
+}
+Compiled from "SourceFile"
+public final class ai.pleos.playground.vehicle.constant.telltale.TelltaleType extends java.lang.Enum<ai.pleos.playground.vehicle.constant.telltale.TelltaleType> {
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType$Companion Companion;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType PARKING_BRAKE;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType ELECTRONIC_PARKING_BRAKE;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType SEAT_BELT;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType DOOR_OPEN;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType ABS;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType MDPS;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType TPMS;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType LOW_VOLT_BATTERY;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType ESC;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType ESC_OFF;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType AIRBAG;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType AFS;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType MASTER_WARNING;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType AUTO_HOLD;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType AUTO_HIGH_BEAM;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType HEADLAMP_LOW;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType HEADLAMP_HIGH;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType POSITION_LAMP;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType FRONT_FOG_LAMP;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType REAR_FOG_LAMP;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType ENGINE_OIL_PRESSURE;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType ENGINE_TEMPERATURE;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType EMERGENCY_CALL;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType EV_SYSTEM;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType POWER_DOWN;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType RBS;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType IMMOBILIZER;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType ENGINE;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType LED_HEADLAMP;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType PREHEAT;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType PARTICLE_FILTER;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType H2_SENSOR;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType H2_LEAK;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType PASSENGER_AIRBAG_OFF;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType PASSENGER_AIRBAG_ON;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType TURN_SIGNAL_LEFT;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType TURN_SIGNAL_RIGHT;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType ICY_ROAD;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType OVER_SPEED;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType WATER_SEPARATOR;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType SCR;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType LOW_EV_BATTERY;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType HEV_SYSTEM;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType FCEV_SYSTEM;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType EREV_SYSTEM;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType LPI;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType EV_CHARGING_CONNECTOR;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType AWD_LOCK;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType HEV_MODE;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType ISG;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType DBC;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType REV;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType XEV_READY;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType I_PEDAL;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType LOW_FUEL;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType LOW_FUEL_FCEV;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType EV_BATTERY_CONDITIONING;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType TRUNK_OPEN;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType CHILD_PRESENCE_DETECTION_OFF;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType DRIVE_MODE;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType DRIVE_MODE_SPORT;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType DRIVE_MODE_ECO;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType DRIVE_MODE_COMFORT;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType DRIVE_MODE_TERRAIN;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType FORCED_ALL_WHEEL_DRIVE;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType FOUR_WHEEL_DRIVE_MODE_2H;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType FOUR_WHEEL_DRIVE_MODE_4A;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType FOUR_WHEEL_DRIVE_MODE_4H;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType FOUR_WHEEL_DRIVE_MODE_4L;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType TOW_MODE;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType ESC_SPORT;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType CREEP_OFF;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType DRIFT_MODE;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType TRACK_MODE;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType UTILITY_MODE;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType GREEN_ZONE;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType PHEV_MODE;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType PHEV_MODE_HEV;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType PHEV_MODE_AUTO;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType PHEV_MODE_EV_PLUS;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType EREV_MODE;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType LAUNCH_MODE;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType ACCEL_RESPONSE_DASH;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType ACCEL_RESPONSE_ACCEL;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType N_BATTERY_DRAG;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType N_BATTERY_SPRINT;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType N_BATTERY_ENDURANCE;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType FCA;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType LKA;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType LFA;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType LCA_LEFT;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType LCA_RIGHT;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType ELK;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType ICC;
+  public static final ai.pleos.playground.vehicle.constant.telltale.TelltaleType DRIVER_ATTENTION;
+  public static ai.pleos.playground.vehicle.constant.telltale.TelltaleType[] values();
+  public static ai.pleos.playground.vehicle.constant.telltale.TelltaleType valueOf(java.lang.String);
+  public static kotlin.enums.EnumEntries<ai.pleos.playground.vehicle.constant.telltale.TelltaleType> getEntries();
+  public final int getId$Vehicle_release();
+}
+Compiled from "SourceFile"
+public final class ai.pleos.playground.vehicle.constant.unit.DistanceDisplayUnit extends java.lang.Enum<ai.pleos.playground.vehicle.constant.unit.DistanceDisplayUnit> {
+  public static final ai.pleos.playground.vehicle.constant.unit.DistanceDisplayUnit$Companion Companion;
+  public static final ai.pleos.playground.vehicle.constant.unit.DistanceDisplayUnit KILOMETER;
+  public static final ai.pleos.playground.vehicle.constant.unit.DistanceDisplayUnit MILE;
+  public static ai.pleos.playground.vehicle.constant.unit.DistanceDisplayUnit[] values();
+  public static ai.pleos.playground.vehicle.constant.unit.DistanceDisplayUnit valueOf(java.lang.String);
+  public static kotlin.enums.EnumEntries<ai.pleos.playground.vehicle.constant.unit.DistanceDisplayUnit> getEntries();
+  public final int getId$Vehicle_release();
+}
+Compiled from "SourceFile"
+public final class ai.pleos.playground.vehicle.constant.unit.EvBatteryDisplayUnit extends java.lang.Enum<ai.pleos.playground.vehicle.constant.unit.EvBatteryDisplayUnit> {
+  public static final ai.pleos.playground.vehicle.constant.unit.EvBatteryDisplayUnit$Companion Companion;
+  public static final ai.pleos.playground.vehicle.constant.unit.EvBatteryDisplayUnit WATT_HOUR;
+  public static final ai.pleos.playground.vehicle.constant.unit.EvBatteryDisplayUnit AMPERE_HOURS;
+  public static final ai.pleos.playground.vehicle.constant.unit.EvBatteryDisplayUnit KILOWATT_HOUR;
+  public static ai.pleos.playground.vehicle.constant.unit.EvBatteryDisplayUnit[] values();
+  public static ai.pleos.playground.vehicle.constant.unit.EvBatteryDisplayUnit valueOf(java.lang.String);
+  public static kotlin.enums.EnumEntries<ai.pleos.playground.vehicle.constant.unit.EvBatteryDisplayUnit> getEntries();
+  public final int getId$Vehicle_release();
+}
+Compiled from "SourceFile"
+public final class ai.pleos.playground.vehicle.constant.unit.SpeedDisplayUnit extends java.lang.Enum<ai.pleos.playground.vehicle.constant.unit.SpeedDisplayUnit> {
+  public static final ai.pleos.playground.vehicle.constant.unit.SpeedDisplayUnit$Companion Companion;
+  public static final ai.pleos.playground.vehicle.constant.unit.SpeedDisplayUnit METER_PER_SEC;
+  public static final ai.pleos.playground.vehicle.constant.unit.SpeedDisplayUnit MILES_PER_HOUR;
+  public static final ai.pleos.playground.vehicle.constant.unit.SpeedDisplayUnit KILOMETERS_PER_HOUR;
+  public static ai.pleos.playground.vehicle.constant.unit.SpeedDisplayUnit[] values();
+  public static ai.pleos.playground.vehicle.constant.unit.SpeedDisplayUnit valueOf(java.lang.String);
+  public static kotlin.enums.EnumEntries<ai.pleos.playground.vehicle.constant.unit.SpeedDisplayUnit> getEntries();
+  public final int getId$Vehicle_release();
+}
+Compiled from "SourceFile"
+public final class ai.pleos.playground.vehicle.constant.unit.TemperatureUnit extends java.lang.Enum<ai.pleos.playground.vehicle.constant.unit.TemperatureUnit> {
+  public static final ai.pleos.playground.vehicle.constant.unit.TemperatureUnit$Companion Companion;
+  public static final ai.pleos.playground.vehicle.constant.unit.TemperatureUnit CELSIUS;
+  public static final ai.pleos.playground.vehicle.constant.unit.TemperatureUnit FAHRENHEIT;
+  public static ai.pleos.playground.vehicle.constant.unit.TemperatureUnit[] values();
+  public static ai.pleos.playground.vehicle.constant.unit.TemperatureUnit valueOf(java.lang.String);
+  public static kotlin.enums.EnumEntries<ai.pleos.playground.vehicle.constant.unit.TemperatureUnit> getEntries();
+  public final int getId$Vehicle_release();
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.AmbientColorAutoByDriveModeEnabledListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onAmbientColorAutoByDriveModeEnabledUpdated(java.lang.Boolean);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.AmbientLightBrightnessColorListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onBrightnessColorUpdated(java.lang.Integer);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.AmbientLightBrightnessListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onBrightnessUpdated(java.lang.Integer);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.BrakePedalStatusListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onBrakePedalStatusUpdated(java.lang.Boolean);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.CruiseControlStateListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onCruiseControlStateUpdated(ai.pleos.playground.vehicle.constant.control.CruiseControl);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.CruiseControlTargetSpeedListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onCruiseControlTargetSpeedUpdated(java.lang.Float);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.DistanceDrivenListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onDistanceDrivenUpdated(java.lang.Float);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.DoorLockStateListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onDoorLockStateUpdated(java.lang.Boolean);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.DoorPositionListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onPositionUpdated(java.lang.Integer);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.DrivingModeStateListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onDrivingModeStateUpdated(ai.pleos.playground.vehicle.constant.control.DrivingModeType);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.DrivingTimeListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onDrivingTimeUpdated(java.lang.Integer);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.EtcsVoiceGuidanceVolumeListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onEtcsVoiceGuidanceVolumeUpdated(java.lang.Integer);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.EvBatteryEfficiencyListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onEvBatteryEfficiencyUpdated(java.lang.Float);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.EvBatteryLevelListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onEvBatteryLevelUpdated(java.lang.Float);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.EvBatteryStateOfChargeListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onEvBatteryStateOfChargeUpdated(java.lang.Integer);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.EvChargePortOpenListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onEvChargePortOpenUpdated(java.lang.Boolean);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.FuelEconomyListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onFuelEconomyUpdated(java.lang.Float);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.FuelPercentListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onFuelPercentUpdated(java.lang.Integer);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.GearSelectionListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onSelected(ai.pleos.playground.vehicle.constant.control.VehicleGear);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.GloveBoxLockStateListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onGloveBoxLockStateUpdated(java.lang.Boolean);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.HvacAcStateListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onHvacAcStateUpdated(java.lang.Boolean);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.HvacAirCleanerStateListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onHvacAirCleanerStateUpdated(java.lang.Boolean);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.HvacAutoStateListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onHvacAutoStateUpdated(java.lang.Boolean);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.HvacDefrosterStateListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onHvacDefrosterStateUpdated(java.lang.Boolean);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.HvacDualStateListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onHvacDualStateUpdated(java.lang.Boolean);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.HvacFanSpeedListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onHvacFanSpeedUpdated(java.lang.Integer);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.HvacMaxAcStateListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onHvacMaxAcStateUpdated(java.lang.Boolean);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.HvacMaxDefrostStateListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onHvacMaxDefrostStateUpdated(java.lang.Boolean);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.HvacPowerStateListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onHvacPowerStateUpdated(java.lang.Boolean);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.HvacRecirculationStateListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onHvacAutoRecirculationStateUpdated(java.lang.Boolean);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.HvacSeatTemperatureListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onHvacSeatTemperatureUpdated(java.lang.Integer);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.HvacSeatVentilationListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onHvacSeatVentilationUpdated(java.lang.Integer);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.HvacSideMirrorHeatStateListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onHvacSideMirrorHeatStateUpdated(java.lang.Integer);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.HvacSteeringWheelHeatStateListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onHvacSteeringWheelHeatStateUpdated(java.lang.Integer);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.HvacTemperatureListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onHvacTemperatureUpdated(java.lang.Float);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.HvacTemperatureValueListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onHvacTemperatureUpdated(java.lang.Float, java.lang.Float);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.LightStateListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onLightStateUpdated(ai.pleos.playground.vehicle.constant.control.LightState);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.LowWasherFluidWaringListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onLowWasherFluidWaringUpdated(java.lang.Boolean);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.OilLevelStateListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onOilLevelUpdated(ai.pleos.playground.vehicle.constant.control.OilLevelState);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.PowerDownWarningIndicatorListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onPowerDownWarningIndicatorUpdated(java.lang.Boolean);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.RangeRemainingListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onRangeRemainingChanged(java.lang.Float);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.SeatAirbagDeployedListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onSeatAirbagDeployUpdated(java.lang.Boolean);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.SeatAirbagEnabledListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onSeatAirbagEnabledUpdated(java.lang.Boolean);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.SeatBackrestAnglePositionListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onSeatBackrestAnglePositionUpdated(java.lang.Integer);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.SeatBeltBuckledStateListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onSeatBeltBuckledStateUpdated(java.lang.Boolean);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.SeatBeltHeightPositionListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onSeatBeltHeightPositionUpdated(java.lang.Integer);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.SeatBeltNotBuckledWarningListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onSeatBeltNotBuckledWarningUpdated(java.lang.Boolean);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.SeatDepthPositionListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onSeatDepthPositionUpdated(java.lang.Integer);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.SeatForeAftPositionListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onSeatForeAftPositionUpdated(java.lang.Integer);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.SeatHeadrestAnglePositionListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onSeatHeadrestAnglePositionUpdated(java.lang.Integer);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.SeatHeadrestForeAftPositionListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onSeatHeadrestForeAftPositionUpdated(java.lang.Integer);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.SeatHeadrestHeightAftPositionListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onSeatHeadrestHeightAftPositionUpdated(java.lang.Integer);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.SeatHeightPositionListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onSeatHeightPositionUpdated(java.lang.Integer);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.SeatLumbarForeAftPositionListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onSeatLumbarForeAftPositionUpdated(java.lang.Integer);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.SeatLumbarSideSupportPositionListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onSeatLumbarSideSupportPositionUpdated(java.lang.Integer);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.SeatOccupancyListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onSeatOccupancyUpdated(java.lang.Boolean);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.SeatTiltPositionListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onSeatTiltPositionUpdated(java.lang.Integer);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.SmartGlassLevelListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onSmartGlassLevelUpdated(java.lang.Integer);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.SmartGlassStateListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onSmartGlassStateUpdated(java.lang.Boolean);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.SteeringWheelAngleListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onSteeringWheelAngleUpdated(java.lang.Float);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.TelltaleInfoListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onTelltaleInfoUpdated(ai.pleos.playground.vehicle.api.model.telltale.Telltales);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.TemperatureDisplayUnitListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onTemperatureDisplayUnitUpdated(ai.pleos.playground.vehicle.constant.unit.TemperatureUnit);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.TirePressureListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onTirePressureUpdated(java.lang.Float);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.TripDrivingDistanceListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onTripDrivingDistanceUpdated(ai.pleos.playground.vehicle.api.model.common.TripStatistics<java.lang.Float>);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.TripDrivingTimeListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onTripDrivingTimeUpdated(ai.pleos.playground.vehicle.api.model.common.TripStatistics<java.lang.Integer>);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.TripEvEfficiencyListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onTripEvEfficiencyUpdated(ai.pleos.playground.vehicle.api.model.common.TripStatistics<java.lang.Float>);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.TripFuelEconomyListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onTripFuelEconomyUpdated(ai.pleos.playground.vehicle.api.model.common.TripStatistics<java.lang.Float>);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.TurnSignalStateListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onTurnSignalStateUpdated(ai.pleos.playground.vehicle.constant.area.TurnSignalValue);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onFailed(java.lang.Exception);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.WindowLockStateListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onWindowLockStateUpdated(java.lang.Boolean);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.WindowPositionListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onWindowPositionUpdated(java.lang.Integer);
+}
+Compiled from "SourceFile"
+public interface ai.pleos.playground.vehicle.listener.WiperStateListener extends ai.pleos.playground.vehicle.listener.VehicleListener {
+  public abstract void onWiperStateUpdated(ai.pleos.playground.vehicle.constant.control.WiperState);
+}

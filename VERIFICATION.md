@@ -1,22 +1,62 @@
 # 검증 기록
 
-2026-11-02. 문서상 존재, 빌드 성공, 에뮬레이터 실행, 실차 적용 가능 여부를 구분합니다.
+## 현재 버전 0.4.1 — 2026-11-02
 
-## 완료
+- 앱 이름 `Routines`, versionCode 5. 사용자가 지정한 두 점·곡선 로고를 런처 적응형 아이콘, Android 13 단색 아이콘, 웹 파비콘에 반영했습니다.
+- 시작 방식, 감지할 상태, 값 종류를 아이콘 카드로 선택합니다. 방식별 설정을 보존하고 키보드 방향키·포커스 이동도 지원합니다.
+- 실행 엔진 27/27, Playwright 25/25, Android instrumentation 4/4 통과. 기록: `artifacts/routines-0.4.1-{runtime,ui,device}-tests.log`.
+- APK와 동일한 CSP로 최종 웹 번들을 실행했습니다. 외부 요청 0, JS 오류 0, 로컬 Asta Sans 폰트 및 기본 루틴 실행을 확인했습니다.
+- `assembleDebug`, `assembleDebugAndroidTest`, `lintDebug` 성공. lint 오류 0, 경고 10(대상 SDK·테스트 라이브러리 버전·백업 메타데이터·아이콘 리소스 구성·진단 화면 문자열).
+- 1440px/375px에서 직접 실행 → 차량 상태 감지 → API 상태 변화 감지의 3회 시각 검증. 6개 캡처에서 카드 정렬·한글 가독성·가로 넘침·스크롤과 고정 적용 버튼을 확인했습니다. `artifacts/start-choice-rounds/round-{1,2,3}-{1440,375}.png`.
+- Pleos Connect 2.1 Android 14 에뮬레이터(`emulator-5554`, 사용자 10)에 기존 데이터를 유지하여 설치하고, 설치 버전과 실제 실행 화면·새 아이콘을 확인했습니다. `artifacts/routines-0.4.1-emulator.png`.
+- 최종 APK: `artifacts/Routines-0.4.1-debug.apk`.
+- SHA-256: `A0BE0E46879C5C9EF1DF98804C89FABD2FBE34284180A1F33A3BC71E30B8AAF0`.
 
-- Pleos Connect 2.1.0 시스템 이미지 설치 및 Android 14 부팅.
-- WHPX 가속, ADB 연결, 실제 인포테인먼트 화면 확인.
-- Virtual Console `http://127.0.0.1:8088/` HTTP 200 확인.
-- Vehicle SDK 2.3.2 AAR 및 의존성 다운로드.
-- 조회 전용 진단 코드의 Kotlin 컴파일 성공. 최종 APK 패키징은 중단 후 재개 대상.
-- HVAC 공개 API에 현재 온도 조회와 구독 함수가 있음을 문서·AAR 공개 시그니처로 확인.
+### 현재 API 범위와 한계
 
-## 아직 완료로 주장하지 않는 항목
+카탈로그 510개 항목을 노출합니다(Vehicle 476, AAOS 2, Connect 32). Vehicle 선언과 인자 변환 476개를 SDK와 대조했습니다. ERROR deprecated 쓰기 1개는 실행을 거부하며 활성 쓰기 55개는 capability 검사를 거칩니다. 복합 위치 값과 섭씨/화씨 범위·단위 변환도 검사했습니다.
 
-- 최종 APK 빌드, 설치 및 Vehicle SDK 런타임 응답.
-- HVAC·창문·좌석 제어 후 실제 상태 변경과 복원.
-- 위치 진입/이탈, TTS 출력, 앱 종료·재시동 뒤 자동화 유지.
-- 사용자 간 공유 서비스와 외부 문자 발송.
-- Gleo 연동은 제품 우선순위에서 뒤로 미룸.
+네이티브 도어 조회와 대표 capability 응답은 `artifacts/routines-0.4.1-device-probe.json`에 기록했습니다. 에뮬레이터의 타이어 압력은 `ERROR_NOT_SUPPORTED_PROPERTY`를 반환합니다. 목록에 노출된 모든 기능의 실차 지원을 의미하지 않으며, 실제 오류를 데모 성공으로 대체하지 않습니다. Gleo는 별도 스키마 승인이 필요합니다. 이벤트 감지는 현재 앱 화면을 열어 둔 동안만 동작하며 백그라운드 자동화·실차 검증은 완료하지 않았습니다.
 
-실행 검증을 진행하면서 결과와 실패 원인을 이 파일에 갱신합니다. 시뮬레이션 값으로 실제 SDK 성공을 대신 표시하지 않습니다.
+## 이전 버전 기록 — 0.3.0
+
+아래는 당시 구현 범위와 결과를 보존한 과거 기록입니다. 현재 버전의 범위는 위 0.4.1 절을 따릅니다.
+
+2026-11-02 · 카드 편집기 0.3.0. 브라우저, Android 패키지, SDK 및 실차 검증을 구분합니다.
+
+## 기능 검증
+
+- 실행 엔진 `npm test`: 17 / 17 통과. 조건, 반복, 변수, 타입 오류, 취소, 실행 제한, 가져오기 검증 및 SDK 오류 전파.
+- 실제 Chromium `npm run test:ui`: 12 / 12 통과. 카드 수정/실행/저장/복원, 추가/삭제/되돌리기/다시 실행, 실제 드래그로 분기 이동, 메뉴 정렬/복제, 기존 JSON 호환, 이벤트 opt-in, 중지, 미지원 SDK 표시, 반복/변수, 조건 편집, 빈 숫자 오류, 반응형, 키보드/모달.
+- `npm run test:production`: 최종 APK 웹 번들, 동일 CSP 조건에서 실행 성공. 외부 요청 0, JS 오류 0, 로컬 폰트 확인.
+- `assembleDebug lintDebug`: 성공. lint 0 errors / 5 warnings. targetSdk 34, 기존 API 28 백업 메타데이터, 진단 화면의 한국어 하드코딩 경고.
+- npm audit: 취약점 0. Blockly 런타임 의존성 및 생성 미디어 제거.
+
+## 시각 검증
+
+1440×960 / 375×812에서 Playwright로 실제 화면을 캡처하고 검토했습니다. 추가로 1024px를 검사했습니다.
+
+| 회차 | 확인 및 조치 |
+| --- | --- |
+| 카드 1차 | 오른쪽 패널·왼쪽 팔레트 제거, 흰 카드·연결선·모바일 세로 분기. 전체 구조와 한글 크기 확인 |
+| 카드 2차 | 숫자 값 정렬, 분기 합류선, 추가 버튼 의미 구분. 조건 편집·동작 추가·테스트 결과·보관함 확인 |
+| 카드 3차 | 긴 한글 문장, 카드 메뉴, 파일 오류, 키보드 포커스. 넘침·글자 잘림·JS 오류 없음 |
+| 마지막 점검 | 모바일 설정 창의 불필요한 스크롤바 여백 제거 후 재촬영. 반복 안의 동작과 분기 중첩을 1440px/375px에서 확인 |
+
+대표 파일: `screenshots/routines-editor.png`, `screenshots/routines-mobile.png`.
+원본 및 JSON: `artifacts/cards-round-1`, `cards-round-2`, `cards-round-3`, `cards-final`.
+이전 `visual-round-*`는 0.2 퍼즐 편집기의 비교 기록입니다.
+
+## Android와 SDK
+
+공식 Connect 2.1.0 / Android 14 x86_64, WHPX 가속, AVD `Pleos_Connect_v2_1`.
+
+- 0.3 APK를 `emulator-5554`에 기존 데이터 유지 설치(`adb install -r`)하고 MainActivity 시작 요청 성공.
+- SDK 브리지와 실행 엔진은 유지했습니다. 이전 0.2 네이티브 검증에서 테스트 루틴 22°C / 풍량 3, 실제 SDK 도어 닫힘 `0`, Virtual Console FL door를 연 후 진단 화면의 `1` 응답을 확인했습니다. 이 기록은 새로운 차량 제어 기능의 검증으로 확대 해석하지 않습니다.
+- D단에서는 Pleos 시스템이 편집기를 제한합니다. P단으로 전환하면 사용할 수 있습니다.
+- 최종 APK: `artifacts/pleos-routines-0.3.0-debug.apk`.
+- SHA-256: `E31C1BC766F411ED2C01CA3444B57193A42B69799307671CB2F65AEABD4C170B`.
+
+## 범위
+
+공조·풍량·배터리·속도는 앱 내부 테스트 데이터입니다. 네이티브 SDK 어댑터는 운전석 도어 조회만 구현합니다. 실차 검증, 백그라운드 자동화, Gleo, 외부 서비스 호출은 완료로 주장하지 않습니다.

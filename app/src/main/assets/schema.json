@@ -1,0 +1,64 @@
+{
+  "packageName": "dev.pleoslab",
+  "appDescription": "Create and run user-defined vehicle routines.",
+  "invokeWord": "루틴",
+  "version": "0.4.1",
+  "actionCalls": [
+    {
+      "type": "function",
+      "function": {
+        "name": "RUN_ROUTINE",
+        "description": "Run a named routine that the user has armed in the foreground app.",
+        "component": "activity",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "routineName": {
+              "type": "string",
+              "description": "Name of the routine to request."
+            }
+          },
+          "required": [
+            "routineName"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "STOP_ROUTINE",
+        "description": "Send a stop request to a routine listening for this command.",
+        "component": "activity",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "routineName": {
+              "type": "string",
+              "description": "Name of the routine to request."
+            }
+          },
+          "required": []
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "LIST_ROUTINES",
+        "description": "Request routine information from the foreground app.",
+        "component": "activity",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "routineName": {
+              "type": "string",
+              "description": "Name of the routine to request."
+            }
+          },
+          "required": []
+        }
+      }
+    }
+  ]
+}

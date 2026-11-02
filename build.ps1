@@ -2,6 +2,10 @@ param([switch]$Install)
 . (Join-Path $PSScriptRoot 'environment.ps1')
 Push-Location $PSScriptRoot
 try {
+    if (-not (Test-Path (Join-Path $PSScriptRoot 'node_modules/blockly'))) {
+        & npm.cmd ci
+        if ($LASTEXITCODE -ne 0) { throw 'Web dependency installation failed.' }
+    }
     & ./gradlew.bat --no-daemon --max-workers=1 assembleDebug
     if ($LASTEXITCODE -ne 0) { throw 'Gradle build failed.' }
     if ($Install) {

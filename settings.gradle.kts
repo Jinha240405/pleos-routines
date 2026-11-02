@@ -7,9 +7,9 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven("https://nexus-playground.pleos.ai/repository/maven-releases/") {
-            content { includeGroup("ai.pleos.playground") }
+            content { includeGroupByRegex("ai\\.pleos\\.playground(\\..*)?") }
         }
     }
 }
-rootProject.name = "PleosLab"
+rootProject.name = "PleosRoutines"
 include(":app")
