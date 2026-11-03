@@ -7,5 +7,5 @@ export default defineConfig({
   root: 'web',
   base: './',
   build: { outDir: '../app/src/main/assets/editor', emptyOutDir: true, assetsInlineLimit: 0, chunkSizeWarningLimit: 1000 },
-  server: { port: 5173, strictPort: true },
+  server: { port: 5173, strictPort: true, proxy: { '/api/community': { target: `http://127.0.0.1:${process.env.COMMUNITY_PORT || 8787}`, changeOrigin: true } } },
 });

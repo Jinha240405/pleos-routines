@@ -4,7 +4,7 @@ import { flushSync } from 'react-dom';
 import { Button } from './components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from './components/ui/tabs';
 
-let state = { view: 'editor', running: false, count: 1, mode: 'demo' };
+let state = { view: 'editor', running: false, count: 1, connected: !!window.AndroidBridge };
 const listeners = new Set();
 const subscribe = fn => { listeners.add(fn); return () => listeners.delete(fn); };
 export function updateChrome(patch) { state = { ...state, ...patch }; listeners.forEach(fn => fn()); }
@@ -19,21 +19,21 @@ function Header() {
       <TabsList aria-label="앱 화면">
         <TabsTrigger id="editorTab" aria-controls="editorView" value="editor">편집기</TabsTrigger>
         <TabsTrigger id="libraryTab" aria-controls="libraryView" value="library" disabled={current.running}>내 루틴 <span id="routineCount" className="count">{current.count}</span></TabsTrigger>
+        <TabsTrigger id="communityTab" aria-controls="communityView" value="community" disabled={current.running}>커뮤니티</TabsTrigger>
       </TabsList>
     </Tabs>
     <div className="header-end"><Button id="helpButton" variant="ghost" size="icon" aria-label="사용 방법"><Icon name="help" /></Button></div>
   </>;
 }
 function Toolbar() {
-  const { running, mode } = useChrome();
+  const { running, connected } = useChrome();
   return <>
     <div className="project-title"><div><label className="sr-only" htmlFor="routineName">루틴 이름</label><input id="routineName" maxLength={80} defaultValue="쾌적한 출발" disabled={running} /><div id="saveStatus" className="save-status" role="status">모든 변경 사항 저장됨</div></div></div>
     <div className="project-actions">
       <Button id="shareButton" variant="ghost" size="sm" disabled={running} aria-label="루틴 가져오기 · 내보내기"><Icon name="share" /><span className="file-label">파일</span></Button>
-      <Button id="testButton" variant="outline" size="sm"><Icon name="activity" />테스트 설정</Button>
       <span className="divider" />
       <Button id="stopButton" className={running ? '' : 'hidden'} size="sm" disabled={!running}><Icon name="stop" />중지</Button>
-      <Button id="runButton" className={running ? 'hidden' : ''} size="sm" disabled={running}><Icon name="play" />{mode === 'demo' ? '테스트 실행' : '실행'}</Button>
+      <Button id="runButton" className={running ? 'hidden' : ''} size="sm" disabled={running || !connected}><Icon name="play" />{connected ? '실행' : '차량에서 실행'}</Button>
     </div>
   </>;
 }

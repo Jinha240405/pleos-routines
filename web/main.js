@@ -5,8 +5,9 @@ import '@fontsource-variable/asta-sans';
 import './pleos-theme.css';
 import './choice-cards.css';
 import './conditions.css';
-import { configureApi, callApi, watchApi, clearApiWatches, receiveApiEvent, literalArguments, operationMap, apiNode, setSample } from './api.js';
-import { mountApiInspector } from './api-ui.jsx';
+import { configureApi, callApi, watchApi, clearApiWatches, receiveApiEvent, literalArguments, operationMap } from './api.js';
+import { mountCommunity } from './community.jsx';
+import { createCommunityClient } from './community-client.js';
 import { mountChrome, updateChrome } from './chrome.jsx';
 import { createFlowEditor, countSteps } from './flow-editor.jsx';
 import { RoutineRunner, parseRoutine, exportRoutine, validateWorkspace } from './runtime.js';
@@ -49,7 +50,7 @@ const native = window.AndroidBridge;
 const pending = new Map(); let requestId = 0;
 window.PleosNative = {
   resolve(id, result) { const request = pending.get(id); if (!request) return; clearTimeout(request.timer); pending.delete(id); result.ok ? request.resolve(result.value) : request.reject(new Error(result.error)); },
-  pause() { runner.cancel(); $('watchEvents').checked = false; },
+  pause() { runner.cancel(); disarmEvents(); },
   event(token,value,error){receiveApiEvent(token,value,error);},
 };
 function nativeCall(action, payload = {}) {
@@ -77,10 +78,9 @@ try {
 } catch { loadWarning = '저장된 루틴을 읽지 못했어요. 예제로 시작합니다. 기존 저장본은 다음 편집 전까지 유지돼요.'; }
 if (!store) { const first = fresh(templates[0].name, templates[0].workspace); store = { version: 1, activeId: first.id, routines: [first] }; }
 let active = store.routines.find(r => r.id === store.activeId) ?? store.routines[0];
-let loading = false, saveTimer, mode = 'demo', logEntries = [], lastVariables = {}, eventTimer, templateCategory = '전체';
+let loading = false, saveTimer, logEntries = [], lastVariables = {}, eventTimer, templateCategory = '전체';
 let watchGeneration=0;
 let afterStopEvent=null;
-const demo = { temperature: 28, battery: 72, door: false, speed: 0, climate: 24, fan: 0 };
 const editor = createFlowEditor($('flowEditor'), () => {
   if($('watchEvents').checked)disarmEvents();
   updateEditorTools();
@@ -107,7 +107,6 @@ function loadRoutine(routine) {
   disarmEvents();
   clearTimeout(eventTimer); $('watchEvents').checked = false; loading = true;
   active = routine; store.activeId = routine.id;
-  for(const sample of templates.find(t=>t.id===routine.templateId)?.samples||[])setSample(sample.id,sample.args,sample.value);
   editor.load(routine.workspace);
   $('routineName').value = routine.name;
   $('routineCount').textContent = store.routines.length;
@@ -116,9 +115,12 @@ function loadRoutine(routine) {
   $('executionState').textContent = '실행 준비 완료';
 }
 function addRoutine(name, state, templateId) {
-  if (store.routines.length >= 50) return toast('루틴은 최대 50개까지 저장할 수 있어요.', true);
-  persist();
-  const r = fresh(name, state); if(templateId)r.templateId=templateId;store.routines.push(r); loadRoutine(r); persist(); showEditor(); toast('새 루틴을 만들었어요. 자유롭게 바꿔보세요.');
+  if (store.routines.length >= 50) { toast('루틴은 최대 50개까지 저장할 수 있어요.', true); return false; }
+  if (!persist()) return false;
+  const previous = active;
+  const r = fresh(name, state); if(templateId)r.templateId=templateId;store.routines.push(r); loadRoutine(r);
+  if (!persist()) { store.routines.pop(); loadRoutine(previous); return false; }
+  showEditor(); toast('새 루틴을 만들었어요. 자유롭게 바꿔보세요.'); return true;
 }
 function log(message, kind = 'info') {
   logEntries.unshift({ message, kind, at: new Date().toLocaleTimeString('ko-KR', { hour12: false }) });
@@ -142,52 +144,29 @@ function renderVariables(vars) {
   }
   if (!Object.keys(vars).length) { const p = document.createElement('p'); p.className = 'empty-variables'; p.textContent = '실행 중 만들어진 변수가 여기에 표시돼요.'; $('variablesList').append(p); }
 }
-function renderVehicle() {
-  $('climateValue').innerHTML = mode === 'demo' ? `${demo.climate}<small>°C</small>` : '—';
-  $('fanValue').innerHTML = mode === 'demo' ? `${demo.fan}<small>단계</small>` : '—';
-  $('doorValue').textContent = mode === 'demo' ? (demo.door ? '열림' : '닫힘') : '미조회';
-  $('temperatureOutput').textContent = `${demo.temperature}°C`;
-  $('batteryOutput').textContent = `${demo.battery}%`;
-  $('doorToggle').setAttribute('aria-checked', String(demo.door));
-}
-async function browserSay(text) {
-  if (!('speechSynthesis' in window)) throw new Error('이 브라우저에서는 음성 출력을 지원하지 않아요.');
-  await new Promise((resolve, reject) => {
-    const utterance = new SpeechSynthesisUtterance(text); utterance.lang = 'ko-KR';
-    utterance.onend = resolve;
-    utterance.onerror = event => reject(new Error(`음성 출력 실패: ${event.error}`));
-    speechSynthesis.speak(utterance);
-  });
-}
 const adapter = {
   invoke:callApi,
   async read(signal) {
     if (!['temperature', 'battery', 'door', 'speed'].includes(signal)) throw new Error('지원하지 않는 차량 상태예요.');
-    if (mode === 'demo') { log(`${blockSignalLabel(signal)}: ${demo[signal]} · 테스트 값`); return demo[signal]; }
     if(signal==='temperature')return callApi('HVAC.getHvacTemperatureCurrent',defaultArgs('HVAC.getHvacTemperatureCurrent'));
     if(signal==='battery')return callApi('EvBattery.getEvBatteryStateOfCharge',[]);
     if(signal==='speed')return callApi('AAOS.speed',[]);
     const result = await nativeCall('door');
     if (typeof result.open !== 'boolean') throw new Error('도어 상태 응답이 올바르지 않아요.');
-    $('doorValue').textContent = result.open ? '열림' : '닫힘';
     log(`운전석 도어 ${result.open ? '열림' : '닫힘'} · Vehicle SDK 응답 ${result.raw}`, 'success');
     return result.open;
   },
   async set(action, value) {
-    if(mode!=='demo'){
-      const id=action==='climate'?'HVAC.setHvacTemperature':'HVAC.setHvacFanSpeed';const op=operationMap.get(id),args=defaultArgs(id);args[op.params.findIndex(p=>p.kind==='number')]=value;
-      await callApi(id,args);$(action==='climate'?'climateValue':'fanValue').textContent=action==='climate'?`${value}°C`:`${value}단계`;return;
-    }
-    demo[action] = value; renderVehicle();
-    log(action === 'climate' ? `설정 온도 → ${value}°C · 시뮬레이션` : `바람 세기 → ${value}단계 · 시뮬레이션`, 'success');
+    const id=action==='climate'?'HVAC.setHvacTemperature':'HVAC.setHvacFanSpeed';
+    const op=operationMap.get(id),args=defaultArgs(id);args[op.params.findIndex(p=>p.kind==='number')]=value;
+    await callApi(id,args);
   },
   async notify(text) { log(text, 'success'); toast(text); },
-  async say(text) { log(`음성 출력 요청: ${text}`); if (native) await nativeCall('speak', { text }); else await browserSay(text); log('음성 출력 완료', 'success'); },
+  async say(text) { log(`음성 출력 요청: ${text}`); await nativeCall('speak', { text }); log('음성 출력 완료', 'success'); },
   cancel() { window.speechSynthesis?.cancel(); if (native) nativeCall('cancel').catch(() => {}); },
 };
 function defaultArgs(id){return operationMap.get(id).params.map(p=>structuredClone(p.default));}
-configureApi({call:nativeCall,vehicle:()=>mode==='vehicle',log});
-mountApiInspector($('apiInspectorRoot'));
+configureApi({call:nativeCall,vehicle:()=>true,log});
 const runner = new RoutineRunner(adapter, {
   onBlock: id => editor.highlight(id),
   onVariables: renderVariables,
@@ -196,17 +175,18 @@ const runner = new RoutineRunner(adapter, {
 function blockSignalLabel(s) { return { temperature: '실내 온도', battery: '배터리', door: '운전석 도어 열림', speed: '차량 속도' }[s]; }
 function runningUI(value) {
   updateChrome({ running: value });
-  $('runButton').disabled = value; $('stopButton').disabled = !value;
+  $('runButton').disabled = value || !native; $('stopButton').disabled = !value;
   editor.lock(value);
-  for (const id of ['shareButton', 'demoMode', 'vehicleMode', 'routineName', 'undoButton', 'redoButton', 'libraryTab', 'probeButton', 'diagnosticsButton']) $(id).disabled = value;
+  for (const id of ['shareButton', 'routineName', 'undoButton', 'redoButton', 'libraryTab', 'communityTab']) $(id).disabled = value;
   updateEditorTools();
 }
 async function run(event = 'manual') {
   if (runner.running) { if (event !== 'manual') log('실행 중에 들어온 이벤트는 건너뛰었어요.'); return; }
-  persist(); const state = snapshot();
+  if (!native) { toast('차량에서 실행해 주세요. 브라우저에서는 편집과 공유를 할 수 있어요.', true); return; }
+  if (!persist()) return; const state = snapshot();
   editor.warn(null);
   runningUI(true); $('executionState').textContent = '루틴 실행 중';
-  log(`${active.name} 시작 · ${mode === 'demo' ? '테스트 차량' : 'Pleos 연결'}${event !== 'manual' ? ' · 이벤트' : ''}`);
+  log(`${active.name} 시작 · Pleos 연결${event !== 'manual' ? ' · 이벤트' : ''}`);
   try {
     const result = await runner.run(state, event);
     log(result.stopped ? '중지 블록에서 실행을 마쳤어요.' : '루틴 실행을 마쳤어요.', 'success');
@@ -222,17 +202,9 @@ async function run(event = 'manual') {
     if(next)queueMicrotask(()=>{if(next.generation===watchGeneration&&$('watchEvents').checked&&!document.hidden)run(next.event)});
   }
 }
-function scheduleEvent(event) {
-  if (mode !== 'demo' || !$('watchEvents').checked || document.hidden) return;
-  clearTimeout(eventTimer);
-  eventTimer = setTimeout(() => {
-    if (!$('watchEvents').checked || mode !== 'demo') return;
-    const matches = snapshot().blocks.blocks.some(b => b.type === 'routine_event' && b.fields?.EVENT === event);
-    if (matches) run(event);
-  }, 250);
-}
 function disarmEvents(){watchGeneration++;afterStopEvent=null;clearTimeout(eventTimer);if($('watchEvents'))$('watchEvents').checked=false;clearApiWatches();document.body.classList.remove('watching');}
 async function armEvents(){
+  if (!native) { disarmEvents(); toast('상태 감지는 Pleos 앱에서 사용할 수 있어요.', true); return; }
   const generation=++watchGeneration;await clearApiWatches();if(generation!==watchGeneration||!$('watchEvents').checked)return;
   const starts=snapshot().blocks.blocks.filter(b=>!b.disabled&&b.enabled!==false);
   try{
@@ -240,7 +212,7 @@ async function armEvents(){
       if(generation!==watchGeneration||!$('watchEvents').checked)return;
       let id,args;
       if(root.type==='routine_api_event'){id=root.fields.API;args=literalArguments(root);}
-      else if(root.type==='routine_event'&&mode==='vehicle'){id={door:'Door.registerDoorPosition',temperature:'HVAC.registerHvacTemperatureCurrent',battery:'EvBattery.registerEvBatteryStateOfCharge',speed:'AAOS.speedChanged'}[root.fields.EVENT];if(!id)continue;args=defaultArgs(id);}
+      else if(root.type==='routine_event'){id={door:'Door.registerDoorPosition',temperature:'HVAC.registerHvacTemperatureCurrent',battery:'EvBattery.registerEvBatteryStateOfCharge',speed:'AAOS.speedChanged'}[root.fields.EVENT];if(!id)continue;args=defaultArgs(id);}
       else continue;
       const token=`watch-${generation}-${root.id}`;let last,initialized=false,lastRun=0;
       const stateful=operationMap.get(id).source!=='connect'||id==='Location.changed';
@@ -255,24 +227,13 @@ async function armEvents(){
         run(root.type==='routine_api_event'?{rootId:root.id,value}:root.fields.EVENT);
       });
     }
-    if(generation===watchGeneration){log(mode==='demo'?'테스트 이벤트를 기다려요. 연결 및 테스트에서 이벤트 값을 보낼 수 있어요.':'상태 감지를 등록했어요. 첫 상태를 기준으로 이후 변화를 감지합니다.');document.body.classList.add('watching');}
+    if(generation===watchGeneration){log('상태 감지를 등록했어요. 첫 상태를 기준으로 이후 변화를 감지합니다.');document.body.classList.add('watching');}
   }catch(error){if(generation===watchGeneration){disarmEvents();log(error.message,'error');toast(error.message,true);}}
 }
-function setMode(next) {
-  if (runner.running) return;
-  if (next === 'vehicle' && !native) { $('modeNote').textContent = 'Pleos 연결은 Android APK에서 사용할 수 있어요. 브라우저에서는 테스트 차량을 사용해 주세요.'; return; }
-  disarmEvents();mode = next; clearTimeout(eventTimer); $('watchEvents').checked = false; $('watchEvents').disabled = false;
-  updateChrome({ mode });
-  $('demoMode').classList.toggle('selected', next === 'demo'); $('vehicleMode').classList.toggle('selected', next === 'vehicle');
-  $('stateControls').hidden = next !== 'demo'; $('nativeInfo').hidden = next === 'demo';
-  $('previewTitle').textContent = next === 'demo' ? '테스트 설정과 기록' : '차량 연결과 기록';
-  $('modeNote').textContent = next === 'demo' ? '가상 데이터로 실행합니다. 실제 차량은 바뀌지 않아요.' : '실제 SDK 응답을 표시합니다.';
-  renderVehicle();
-}
-function showEditor() { updateChrome({ view: 'editor' }); $('libraryView').hidden = true; $('editorView').hidden = false; }
+function showEditor() { $('communityView').hidden = true; updateChrome({ view: 'editor' }); $('libraryView').hidden = true; $('editorView').hidden = false; }
 function showLibrary() {
   if (runner.running) return; persist();disarmEvents();clearTimeout(eventTimer); $('watchEvents').checked = false;
-  updateChrome({ view: 'library' }); $('editorView').hidden = true; $('libraryView').hidden = false; renderLibrary();
+  $('communityView').hidden = true; updateChrome({ view: 'library' }); $('editorView').hidden = true; $('libraryView').hidden = false; renderLibrary();
 }
 function makeCard(title, description, iconName, tag, onClick) {
   const card = document.createElement('button'); card.className = 'routine-card';
@@ -303,26 +264,18 @@ function renderLibrary() {
     actions.append(duplicate, remove); wrapper.append(actions); $('savedRoutines').append(wrapper);
   }
   $('templateFilters').replaceChildren();
-  for(const category of ['전체','출발','쾌적함','충전','도착']){const button=document.createElement('button');button.type='button';button.textContent=category;button.setAttribute('aria-pressed',String(templateCategory===category));button.onclick=()=>{templateCategory=category;renderLibrary();[...$('templateFilters').children].find(b=>b.textContent===category)?.focus()};$('templateFilters').append(button);}
+  for(const category of ['전체','캠핑','장거리','충전','출발','쾌적함','도착']){const button=document.createElement('button');button.type='button';button.textContent=category;button.setAttribute('aria-pressed',String(templateCategory===category));button.onclick=()=>{templateCategory=category;renderLibrary();[...$('templateFilters').children].find(b=>b.textContent===category)?.focus()};$('templateFilters').append(button);}
   for (const t of templates.filter(t=>templateCategory==='전체'||t.category===templateCategory)) $('templateRoutines').append(makeCard(t.name, t.description, t.icon, t.tag, () => addRoutine(t.name, t.workspace,t.id)));
 }
 $('routineName').oninput = event => { active.name = event.target.value.trim() || '이름 없는 루틴'; clearTimeout(saveTimer); saveTimer = setTimeout(persist, 350); };
 $('routineName').onblur = () => { $('routineName').value = active.name; };
 $('runButton').onclick = () => run(); $('stopButton').onclick = () => runner.cancel();
-$('demoMode').onclick = () => setMode('demo'); $('vehicleMode').onclick = () => setMode('vehicle');
-for (const id of ['temperature', 'battery', 'speed']) $(id).oninput = event => { demo[id] = Number(event.target.value); renderVehicle(); scheduleEvent(id); };
-$('doorToggle').onclick = () => { demo.door = !demo.door; renderVehicle(); scheduleEvent('door'); };
 $('watchEvents').onchange = () => { if ($('watchEvents').checked) armEvents(); else disarmEvents(); };
-$('probeButton').onclick = async () => {
-  $('probeButton').disabled = true;
-  try { await adapter.read('door'); } catch (e) { log(e.message, 'error'); toast(e.message, true); } finally { $('probeButton').disabled = false; }
-};
-$('diagnosticsButton').onclick = () => nativeCall('diagnostics').catch(e => toast(e.message, true));
 $('libraryNew').onclick = () => addRoutine('새로운 루틴', blankWorkspace());
-document.addEventListener('pleos:navigate', event => event.detail === 'library' ? showLibrary() : showEditor());
+document.addEventListener('pleos:navigate', event => event.detail === 'community' ? showCommunity() : event.detail === 'library' ? showLibrary() : showEditor());
 document.querySelector('.brand').onclick = event => { event.preventDefault(); showLibrary(); };
 $('undoButton').onclick = () => editor.undo(false); $('redoButton').onclick = () => editor.undo(true);
-$('testButton').onclick = $('resultButton').onclick = () => $('testDialog').showModal();
+$('resultButton').onclick = () => $('executionDialog').showModal();
 $('clearLogs').onclick = () => { logEntries = []; $('logList').replaceChildren(); $('logCount').textContent = '0'; };
 function logTab(variables) { $('logsTab').classList.toggle('active', !variables); $('variablesTab').classList.toggle('active', variables); $('logList').hidden = variables; $('variablesList').hidden = !variables; }
 $('logsTab').onclick = () => logTab(false); $('variablesTab').onclick = () => logTab(true);
@@ -350,6 +303,23 @@ document.addEventListener('keydown', event => {
 });
 document.addEventListener('visibilitychange', () => { if (document.hidden) { runner.cancel(); disarmEvents(); clearTimeout(eventTimer); persist(); } });
 window.addEventListener('beforeunload', () => { if (!loading) persist(); disarmEvents();runner.cancel(); });
-loadRoutine(active); renderVehicle(); renderVariables({});
+loadRoutine(active); renderVariables({});
+$('watchEvents').disabled = !native;
+$('connectionNote').classList.add('connection-note');
+$('connectionNote').textContent = native ? 'Pleos 앱 · 차량 상태를 읽어 실행해요.' : '브라우저에서는 편집과 공유를 할 수 있어요. 실행은 Pleos 차량에서 해주세요.';
+if (native) { const button = document.createElement('button'); button.textContent = '차량 권한 허용'; button.className = 'text-button'; button.onclick = () => nativeCall('permissions').then(() => toast('권한을 확인했어요.')).catch(e => toast(e.message, true)); $('connectionNote').append(button); }
 if (loadWarning) toast(loadWarning, true);
-if (import.meta.env.DEV) window.__app = { editor, runner, snapshot, templates, addRoutine, setSample, get store() { return store; }, get demo() { return demo; }, get variables() { return lastVariables; } };
+if (import.meta.env.DEV) window.__app = { editor, runner, snapshot, templates, addRoutine, get store() { return store; }, get variables() { return lastVariables; } };
+
+function showCommunity() {
+  if (runner.running) return;
+  persist(); disarmEvents(); updateChrome({ view: 'community' });
+  $('editorView').hidden = true; $('libraryView').hidden = true; $('communityView').hidden = false;
+  document.dispatchEvent(new Event('pleos:community-open'));
+}
+mountCommunity($('communityRoot'), {
+  request: createCommunityClient(nativeCall), toast,
+  canInstall: () => store.routines.length < 50,
+  getCurrentRoutine: () => { if (!persist()) throw new Error('루틴을 먼저 저장해 주세요.'); return clone(active); },
+  install: addRoutine,
+});

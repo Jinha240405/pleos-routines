@@ -2,7 +2,7 @@ param([switch]$Install)
 . (Join-Path $PSScriptRoot 'environment.ps1')
 Push-Location $PSScriptRoot
 try {
-    if (-not (Test-Path (Join-Path $PSScriptRoot 'node_modules/blockly'))) {
+    if (-not (Test-Path (Join-Path $PSScriptRoot 'node_modules/vite'))) {
         & npm.cmd ci
         if ($LASTEXITCODE -ne 0) { throw 'Web dependency installation failed.' }
     }

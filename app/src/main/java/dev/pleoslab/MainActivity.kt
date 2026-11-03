@@ -33,14 +33,15 @@ class MainActivity : Activity() {
     private var vehicle: Vehicle? = null
     private var tts: TextToSpeech? = null
     private var ttsReady = false
-    private var alive = true
-    private var foreground = false
+    @Volatile private var alive = true
+    @Volatile private var foreground = false
     private var subscriptionGeneration = 0
-    private val pending = mutableSetOf<Int>()
+    private val pending = java.util.concurrent.ConcurrentHashMap.newKeySet<Int>()
     private var exportText: String? = null
     private val area = DoorArea(DoorValue.ROW_1_LEFT)
     private val vehicleApi by lazy { VehicleApi(this, ::emitEvent) }
     private val connectApi by lazy { ConnectApi(this, ::emitEvent) }
+    private val communityApi by lazy { CommunityApi(this) }
     private val apiCatalog by lazy { JSONObject(assets.open("api-catalog.json").bufferedReader().use { it.readText() }).getJSONArray("operations").let { entries -> (0 until entries.length()).associate { entries.getJSONObject(it).let { e -> e.getString("id") to e } } } }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -154,6 +155,7 @@ class MainActivity : Activity() {
                             "permissionState" -> reply(id,permissionState())
                             "diagnostics" -> { reply(id, true); startActivity(Intent(this@MainActivity, DiagnosticsActivity::class.java)) }
                             "export" -> export(id, request.getString("text"), request.optString("name", "routine"))
+                            "community.request" -> communityApi.request(request, { alive && foreground && pending.contains(id) }, { reply(id, it) }, { fail(id, it) })
                             else -> fail(id, "지원하지 않는 기기 요청입니다.")
                         }
                     } catch (e: Exception) { fail(id, e.message ?: "기기 연결에 실패했어요.") }
@@ -270,7 +272,7 @@ class MainActivity : Activity() {
     override fun onDestroy() {
         alive = false; main.removeCallbacksAndMessages(null); pending.clear(); tts?.stop(); tts?.shutdown()
         try { vehicle?.release() } catch (_: Exception) {}
-        vehicleApi.release();connectApi.release()
+        vehicleApi.release();connectApi.release();communityApi.release()
         web.removeJavascriptInterface("AndroidBridge"); web.destroy()
         super.onDestroy()
     }

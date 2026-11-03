@@ -10,8 +10,8 @@ android {
         applicationId = "dev.pleoslab"
         minSdk = 28
         targetSdk = 34
-        versionCode = 6
-        versionName = "0.5.0"
+        versionCode = 7
+        versionName = "0.6.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     compileOptions {
@@ -19,6 +19,11 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions { jvmTarget = "17" }
+    buildFeatures { buildConfig = true }
+    buildTypes {
+        getByName("debug") { buildConfigField("String", "COMMUNITY_URL", "\"http://10.0.2.2:8787\"") }
+        getByName("release") { buildConfigField("String", "COMMUNITY_URL", "\"\"") }
+    }
 }
 dependencies {
     implementation("ai.pleos.playground:Vehicle:2.3.2")

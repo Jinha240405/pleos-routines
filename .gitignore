@@ -13,6 +13,7 @@ local.properties
 *.hprof
 captures/
 node_modules/
+.community-data/
 web/public/DEPENDENCY-LICENSES.txt
 test-results/
 playwright-report/
