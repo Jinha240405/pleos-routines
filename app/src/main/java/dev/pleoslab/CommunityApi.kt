@@ -15,16 +15,16 @@ class CommunityApi(context: Context) {
     private val token: String by lazy {
         preferences.getString("ownerKey", null) ?: ByteArray(32).also { SecureRandom().nextBytes(it) }
             .joinToString("") { "%02x".format(it.toInt() and 255) }.also {
-                check(preferences.edit().putString("ownerKey", it).commit()) { "커뮤니티 기기 키를 저장하지 못했어요." }
+                check(preferences.edit().putString("ownerKey", it).commit()) { "모두의 루틴 기기 키를 저장하지 못했어요." }
             }
     }
     fun request(request: JSONObject, active: () -> Boolean, done: (JSONObject) -> Unit, fail: (String) -> Unit) {
         val path = request.getString("path")
         val method = request.optString("method", "GET")
-        require(path.matches(Regex("(?:health|posts(?:/[a-f0-9-]{36}(?:/download)?)?)(?:\\?[^#\\r\\n]*)?"))) { "지원하지 않는 커뮤니티 주소예요." }
+        require(path.matches(Regex("(?:health|posts(?:/[a-f0-9-]{36}(?:/download)?)?)(?:\\?[^#\\r\\n]*)?"))) { "지원하지 않는 모두의 루틴 주소예요." }
         require(method in listOf("GET", "POST", "DELETE"))
         val endpoint = BuildConfig.COMMUNITY_URL
-        if (endpoint.isBlank()) { fail("커뮤니티 서버가 아직 설정되지 않았어요."); return }
+        if (endpoint.isBlank()) { fail("모두의 루틴 서버가 아직 설정되지 않았어요."); return }
         val base = URL(endpoint)
         require(base.protocol == "https" || (BuildConfig.DEBUG && base.host == "10.0.2.2" && base.protocol == "http"))
         val payload = request.optJSONObject("body")?.toString()
@@ -51,7 +51,7 @@ class CommunityApi(context: Context) {
                     while (true) {
                         val count = input.read(buffer)
                         if (count < 0) break
-                        require(output.size() + count <= 2_000_000) { "커뮤니티 응답이 너무 커요." }
+                        require(output.size() + count <= 2_000_000) { "모두의 루틴 응답이 너무 커요." }
                         output.write(buffer, 0, count)
                     }
                     output.toByteArray()
@@ -60,7 +60,7 @@ class CommunityApi(context: Context) {
                 if (code !in 200..299) error(data.optString("error", "요청을 처리하지 못했어요."))
                 if (active()) done(data)
             } catch (e: Exception) {
-                if (active()) fail(if (e is java.io.IOException) "커뮤니티 서버에 연결하지 못했어요. 컴퓨터에서 서버를 켜 주세요." else e.message ?: "커뮤니티 요청에 실패했어요.")
+                if (active()) fail(if (e is java.io.IOException) "모두의 루틴 서버에 연결하지 못했어요. 컴퓨터에서 서버를 켜 주세요." else e.message ?: "모두의 루틴 요청에 실패했어요.")
             } finally { connection?.disconnect() }
         }
     }

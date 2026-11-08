@@ -5,13 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#FFFFFF" />
   <link rel="icon" type="image/svg+xml" href="./app-icon.svg" />
-  <title>Pleos Routines — 차량 단축어 편집기</title>
+  <title>Pleos Routines — 내 루틴</title>
 </head>
 <body>
   <header id="chromeHeader" class="app-header"></header>
-  <main id="editorView" role="tabpanel" aria-labelledby="editorTab">
+  <div id="globalExecution" class="global-execution" role="status" hidden><strong id="globalExecutionName"></strong><button id="globalStop" class="button subtle" data-icon="stop">실행 중지</button></div>
+  <main id="editorView" aria-label="루틴 편집" hidden>
     <div id="chromeToolbar" class="project-bar"></div>
-    <div class="runtime-toolbar"><p id="connectionNote"></p>        <label class="event-control"><input type="checkbox" id="watchEvents" aria-label="입력 변경 시 실행" /><span class="event-symbol" data-icon="activity" aria-hidden="true"></span><span class="event-copy"><strong class="event-idle">상태 감지 시작</strong><strong class="event-running">상태 감지 중</strong><small>현재 루틴 · 앱 화면을 열어 둔 동안</small></span><span class="event-check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m5 12 4 4 10-10"/></svg></span></label></div>
+    <div class="runtime-toolbar"><div class="connection-context"><p id="connectionNote"></p><span id="monitorStatus" class="state-badge" role="status">OFF · 사용 안 함</span></div><label class="event-control" id="watchControl" hidden><input type="checkbox" role="switch" id="watchEvents" aria-label="루틴 사용 설정" /><span class="event-symbol" data-icon="activity" aria-hidden="true"></span><span class="event-copy"><strong class="event-idle">루틴 OFF</strong><strong class="event-running">루틴 ON</strong><small id="enableHint">ON으로 켠 뒤 실행 버튼을 누르세요</small></span><span class="event-check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m5 12 4 4 10-10"/></svg></span></label></div>
+    <p id="routineSummary" class="routine-summary" aria-label="루틴 요약"></p>
     <div class="editor-layout">
       <section class="workspace-panel" aria-label="루틴 흐름 편집기">
         <div class="workspace-heading">
@@ -22,7 +24,7 @@
           </div>
         </div>
         <div id="flowEditor"></div>
-        <div class="workspace-footer"><span class="watch-state">상태 감지 중</span><span id="executionState" role="status">실행 준비 완료</span><button id="resultButton" hidden>실행 기록 보기 <span data-icon="arrow"></span></button></div>
+        <div class="workspace-footer"><span id="watchState" class="watch-state"></span><span id="executionState" role="status">실행 준비 완료</span><button id="resultButton" hidden>실행 기록 보기 <span data-icon="arrow"></span></button></div>
       </section>
     </div>
   </main>
@@ -34,26 +36,28 @@
           <div id="variablesList" hidden><p class="empty-variables">아직 생성된 변수가 없습니다.</p></div>
         </div>
   </dialog>
-  <main id="communityView" role="tabpanel" aria-labelledby="communityTab" hidden><div id="communityRoot"></div></main>
-  <main id="libraryView" role="tabpanel" aria-labelledby="libraryTab" hidden>
-    <div class="library-intro"><h1>내 루틴</h1><button id="libraryNew" class="button primary" data-icon="plus">새 루틴</button></div>
-    <section><div class="library-section-heading"><h2>저장한 루틴</h2><span id="savedCount"></span></div><div id="savedRoutines" class="routine-grid"></div></section>
-    <section><div class="library-section-heading"><h2>상황별 템플릿</h2><span>눌러서 내 루틴으로 추가</span></div><div id="templateFilters" class="template-filters" role="group" aria-label="템플릿 분류"></div><p class="template-note">값과 동작을 내 차에 맞게 바꿔 쓰세요. 감지형 루틴은 앱 화면에서 상태 감지를 켠 동안만 동작해요.</p><div id="templateRoutines" class="routine-grid"></div></section>
+  <main id="communityView" aria-label="모두의 루틴" hidden><div id="communityRoot"></div></main>
+  <main id="libraryView" aria-labelledby="libraryTitle">
+    <div class="library-intro"><div><span class="page-eyebrow">나에게 맞춘 자동차 생활</span><h1 id="libraryTitle">내 루틴</h1><p>저장한 루틴을 사용하거나, 공식 템플릿으로 새롭게 시작하세요.</p></div><div class="library-heading-actions"><button id="libraryImport" class="button subtle" data-icon="download">가져오기</button><button id="libraryNew" class="button primary" data-icon="plus">새 루틴</button></div></div>
+    <section aria-labelledby="savedTitle"><div class="library-section-heading"><h2 id="savedTitle">저장한 루틴</h2><span id="savedCount"></span></div><p class="routine-enable-note">ON으로 켜면 사용할 수 있어요. 상태 감지는 차량 앱이 화면에 열려 있는 동안 동작하며, 앱을 닫거나 백그라운드로 보내면 일시 중지돼요.</p><div id="savedRoutines" class="routine-grid"></div></section>
+    <section id="officialTemplates" aria-labelledby="templateTitle"><div class="library-section-heading"><div><span class="page-eyebrow">Routines 제공</span><h2 id="templateTitle">공식 템플릿으로 만들기</h2></div><span>내용을 확인하고 내 루틴으로 추가하세요</span></div><div id="templateFilters" class="template-filters" role="group" aria-label="템플릿 분류"></div><p class="template-note">내 차에 맞게 값과 동작을 바꾼 뒤 ON으로 켜 주세요. 새로 추가한 루틴은 OFF로 시작해요.</p><div id="templateRoutines" class="routine-grid"></div></section>
   </main>
+  <dialog id="templateDialog" class="template-dialog" aria-labelledby="templateDialogTitle"><div class="dialog-header"><div><span class="page-eyebrow">공식 템플릿 · Routines 제공</span><h2 id="templateDialogTitle"></h2></div><button class="icon-button close-dialog" data-icon="close" aria-label="닫기"></button></div><p id="templateDescription"></p><dl id="templateOverview" class="template-overview"></dl><p id="templateTip" class="template-tip" hidden></p><div id="templateFeatures" class="feature-chips"></div><p class="install-note">추가하면 내 루틴에 사본이 저장돼요. 실행이나 상태 감지는 직접 시작할 때만 동작합니다. 차량별 지원 여부와 권한을 확인해 주세요.</p><div class="dialog-actions"><button class="button subtle close-dialog">닫기</button><button id="useTemplate" class="button primary" data-icon="plus">이 템플릿으로 만들기</button></div></dialog>
   <dialog id="shareDialog">
     <div class="dialog-header"><h2>루틴 가져오기 · 내보내기</h2><button class="icon-button close-dialog" data-icon="close" aria-label="닫기"></button></div>
-    <p>현재 루틴을 저장하거나 JSON을 붙여 넣어 가져오세요.<br>가져온 루틴은 직접 실행하기 전까지 동작하지 않아요.</p>
-    <textarea id="routineJson" spellcheck="false" aria-label="루틴 JSON"></textarea><p id="importError" class="error-text" role="alert"></p>
-    <div class="dialog-actions"><button id="copyJson" class="button subtle" data-icon="copy">복사</button><button id="downloadJson" class="button subtle" data-icon="download">파일 저장</button><button id="importJson" class="button primary" data-icon="plus">새 루틴으로 가져오기</button></div>
+    <p>루틴 파일을 가져오거나, 현재 루틴을 백업해 다른 기기로 옮길 수 있어요. 가져와도 자동 실행되지 않아요.</p>
+    <label id="webImportFile" class="routine-file-label" for="routineFile">루틴 파일 선택<input id="routineFile" type="file" accept=".json,.pleos.json,application/json" /></label><button id="nativeImportFile" class="button subtle native-file-button" hidden>루틴 파일 선택</button><p id="selectedRoutineFile" class="form-note"></p>
+    <details id="routineJsonAdvanced" class="routine-source"><summary>고급 · JSON 직접 입력·확인</summary><textarea id="routineJson" spellcheck="false" aria-label="루틴 JSON"></textarea><button id="copyJson" class="button subtle" data-icon="copy">JSON 복사</button></details><p id="importError" class="error-text" role="alert"></p>
+    <div class="dialog-actions"><button id="downloadJson" class="button subtle" data-icon="download">현재 루틴 내보내기</button><button id="importJson" class="button primary" data-icon="plus">새 루틴으로 가져오기</button></div>
   </dialog>
   <dialog id="helpDialog">
     <div class="dialog-header"><h2>루틴 만들기</h2><button class="icon-button close-dialog" data-icon="close" aria-label="닫기"></button></div>
     <div class="help-steps">
-      <article><b>1</b><div><h3>동작 추가</h3><p>흐름 끝의 동작 추가 버튼에서 공조, 알림, 조건 등을 선택하세요.</p></div></article>
+      <article><b>1</b><div><h3>내 루틴에서 시작</h3><p>새 루틴을 만들거나 공식 템플릿의 내용을 확인하고 추가하세요. 저장한 루틴을 누르면 편집 화면이 열려요.</p></div></article>
       <article><b>2</b><div><h3>값과 순서 편집</h3><p>카드를 누르면 설정을 바꿀 수 있어요. 왼쪽 핸들을 끌거나 카드 메뉴의 위로·아래로 이동을 사용하세요. 삭제한 동작은 실행 취소로 복원할 수 있습니다.</p></div></article>
-      <article><b>3</b><div><h3>차량에서 실행</h3><p>Pleos 앱에서 차량 기능을 연결해 실행하세요. 브라우저에서는 편집과 커뮤니티를 사용할 수 있어요. 실행 기록에서 결과를 확인할 수 있어요.</p></div></article>
+      <article><b>3</b><div><h3>사용하고 함께 나누기</h3><p>차량 앱에서 실행하거나 감지를 시작하세요. ‘이 루틴 공유’로 모두의 루틴에 올릴 수 있어요. 웹에서는 편집과 공유를 사용할 수 있어요.</p></div></article>
     </div>
-    <p class="help-note">정차한 상태에서 사용하세요. 상태 감지를 켜면 현재 화면에서만 이벤트를 받습니다. 화면을 나가면 감지를 해제합니다.</p><button class="button primary close-dialog">확인</button>
+    <p class="help-note">정차한 상태에서 사용하세요. 루틴을 ON으로 켜면 사용할 수 있어요. 앱 안에서 화면을 이동해도 감지는 유지되며, 앱을 닫거나 백그라운드로 보내면 일시 중지됩니다. ON 설정은 유지되고 앱 복귀 시 감지를 다시 연결해요.</p><button class="button primary close-dialog">확인</button>
   </dialog>
   <div id="toast" class="toast" role="status" hidden></div>
   <script type="module" src="./main.js"></script>

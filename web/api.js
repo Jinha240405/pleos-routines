@@ -83,6 +83,7 @@ export async function watchApi(id,args,token,callback){
   catch(error){watch.delete(token);throw error;}
 }
 export function receiveApiEvent(token,value,error){const entry=watch.get(token);if(!entry)return;apiState.status.set(entry.id,error?{state:'error',message:error}:{state:'success',value,mode:transport.vehicle()?'vehicle':'demo'});changed();entry.callback(value,error);}
+export async function unwatchApi(token){watch.delete(token);if(transport.vehicle())await transport.call('api.unsubscribe',{token});}
 export function simulateApiEvent(id,value){if(transport.vehicle())throw new Error('테스트 차량 모드에서만 보낼 수 있어요.');let count=0;for(const [token,entry] of watch)if(entry.id===id){receiveApiEvent(token,value,null);count++;}return count;}
 export async function clearApiWatches(){watch.clear();if(transport.vehicle())await transport.call('api.clearSubscriptions').catch(error=>transport.log(error.message,'error'));}
 export const isVehicleMode=()=>transport.vehicle();

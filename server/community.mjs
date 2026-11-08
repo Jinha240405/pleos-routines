@@ -17,7 +17,7 @@ export async function createCommunityServer({ dataDir = path.join(project, '.com
   let posts = [];
   try {
     const saved = JSON.parse(await readFile(database, 'utf8'));
-    if (saved.version !== 1 || !Array.isArray(saved.posts)) throw new Error('커뮤니티 저장 파일 형식 오류');
+    if (saved.version !== 1 || !Array.isArray(saved.posts)) throw new Error('모두의 루틴 저장 파일 형식 오류');
     posts = saved.posts;
   } catch (e) { if (e.code !== 'ENOENT') throw e; }
   let queue = Promise.resolve();
@@ -89,7 +89,7 @@ export async function createCommunityServer({ dataDir = path.join(project, '.com
         return json(200, { ...publicPost(post, owner), routine: post.routine });
       }
       if (!['POST', 'DELETE'].includes(request.method)) throw fail(404, '찾을 수 없는 주소입니다.');
-      if (!owner) throw fail(401, '이 기기의 커뮤니티 키가 필요해요. 저장소를 허용해 주세요.');
+      if (!owner) throw fail(401, '이 기기의 모두의 루틴 키가 필요해요. 저장소를 허용해 주세요.');
       rateLimit(`${request.socket.remoteAddress}:write`, 40);
       if (request.method === 'POST' && endpoint === 'posts') {
         rateLimit(`${owner}:publish`, 10);

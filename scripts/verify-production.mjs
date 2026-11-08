@@ -17,22 +17,43 @@ try {
   const external = [];
   page.on('request', request => { if (!request.url().startsWith(address)) external.push(request.url()); });
   await page.goto(address);
+  await page.locator('#libraryTitle').waitFor();
+  assert.equal(await page.locator('#editorTab').count(),0);
+  assert.equal(await page.locator('#routineCount').textContent(),'0');
+  assert.equal(await page.locator('#templateRoutines .routine-card').count(),17);
   await page.locator('#communityTab').click();
   await page.getByRole('heading', { name: '첫 번째 루틴을 나눠 주세요' }).waitFor();
   assert.equal(await page.locator('#runButton').isDisabled(), true);
   assert.equal(await page.locator('#testButton,#testDialog').count(), 0);
-  assert.equal(await page.locator('.starter-grid .community-card').count(), 5);
+  assert.equal(await page.locator('.starter-grid .community-card').count(), 0);
+  assert.equal(await page.locator('#communityTab').textContent(),'모두의 루틴');
+  await page.locator('#libraryTab').click();
   await page.getByRole('button', { name: /캠핑 철수 브리핑/ }).click();
-  await page.getByRole('button', { name: '내 루틴에 내려받기', exact: true }).click();
+  await page.getByRole('button', { name: '이 템플릿으로 만들기', exact: true }).click();
   await page.waitForFunction(() => document.getElementById('routineName').value === '캠핑 철수 브리핑');
   assert.equal(await page.locator('#watchEvents').isChecked(), false);
   assert.equal(await page.evaluate(()=>document.fonts.check('500 18px "Asta Sans Variable"')),true);
   assert.match(await page.evaluate(()=>getComputedStyle(document.body).fontFamily),/Asta Sans/);
+  await page.locator('#backToLibrary').click();
+  await page.locator('.routine-toggle').click();
+  await page.reload();
+  await page.locator('.routine-toggle[aria-checked=true]').waitFor();
+  assert.match(await page.locator('.routine-saved-state').textContent(),/차량 앱에서 사용/);
+  await page.getByRole('button',{name:/쾌적한 출발/}).click();
+  await page.getByRole('button',{name:'이 템플릿으로 만들기',exact:true}).click();
+  await page.locator('#backToLibrary').click();
+  assert.equal(await page.locator('.routine-toggle[aria-checked=false]').count(),1);
+  assert.equal(await page.locator('.card-run:enabled').count(),0);
+  for(const width of [1440,375]) {
+    await page.setViewportSize({width,height:width===375?812:1080});
+    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+    await page.screenshot({path:`artifacts/production-onoff-${width}.png`,fullPage:true});
+  }
   assert.deepEqual(errors, []); assert.deepEqual(external, []);
   await fs.promises.mkdir('artifacts', { recursive: true });
   await page.locator('#communityTab').click();
   await page.screenshot({ path: 'artifacts/production-community.png', fullPage: true });
-  console.log('Production bundle passed: CSP, local community, editable download, no simulated execution or external network.');
+  console.log('Production bundle passed: saved ON/OFF switches, OFF defaults, responsive library, shared routines, CSP, no simulated execution or external network.');
 } finally {
   await browser.close(); server.closeAllConnections(); await new Promise(r => server.close(r));
   assert.equal(path.dirname(path.resolve(dataDir)), path.resolve(tmpdir()));

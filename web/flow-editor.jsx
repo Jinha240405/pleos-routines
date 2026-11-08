@@ -18,10 +18,19 @@ const number = n => ({ type: 'value_number', fields: { VALUE: n } });
 const text = s => ({ type: 'value_text', fields: { VALUE: s } });
 const signalNames = { temperature: '실내 온도', battery: '배터리 잔량', door: '운전석 도어 열림', speed: '주행 속도' };
 const startOptions=[
- {value:'routine_start',label:'직접 실행',icon:'play',description:'실행 버튼을 누르면 시작'},
- {value:'routine_event',label:'차량 상태 감지',icon:'CarInfo',description:'도어·온도·배터리 변화'},
- {value:'routine_api_event',label:'상태 변화 감지',icon:'radar',description:'차량·위치·음성 이벤트'},
+ {value:'routine_start',label:'버튼을 눌러 시작',icon:'play',description:'내가 실행할 때 동작해요'},
+ {value:'event',label:'상태가 바뀌면 시작',icon:'radar',description:'이 화면을 열고 감지를 시작해요'},
 ];
+const eventStartOptions=[
+ {value:'routine_event',label:'도어·온도·배터리',icon:'CarInfo',description:'자주 사용하는 차량 상태'},
+ {value:'routine_api_event',label:'다른 차량·위치·음성',icon:'activity',description:'전체 연결 기능에서 선택'},
+];
+function StartChoices({type,onChange}) {
+ const lastEvent=useRef(type==='routine_api_event'?'routine_api_event':'routine_event');
+ if(type&&type!=='routine_start')lastEvent.current=type;
+ const value=type?(type==='routine_start'?'routine_start':'event'):undefined;
+ return <><IconCards className="start-choices" label="시작 방식" value={value} options={startOptions} onChange={v=>onChange(v==='routine_start'?v:lastEvent.current)}/>{value==='event'&&<section className="event-source-choices"><h3 className="choice-heading">어떤 상태를 감지할까요?</h3><IconCards compact label="감지할 기능" value={type} options={eventStartOptions} onChange={onChange}/></section>}</>;
+}
 const signalOptions=[{value:'door',label:'도어',icon:'Door',description:'운전석 문'},{value:'temperature',label:'실내 온도',icon:'climate',description:'현재 온도'},{value:'battery',label:'배터리',icon:'EvBattery',description:'충전 잔량'},{value:'speed',label:'주행 속도',icon:'DrivingMode',description:'현재 속도'}];
 const valueIcons={result_get:'result',value_number:'number',value_text:'text',value_boolean:'yes',vehicle_signal:'CarInfo',api_read:'link',variable_get:'layers',value_property:'result',event_value:'radar',value_json:'json',logic_compare:'branch',logic_operation:'layers',logic_not:'no',value_math:'calculator',value_join:'link'};
 const operators = { EQ: '=', NEQ: '≠', GT: '>', LT: '<', GTE: '≥', LTE: '≤', AND: '그리고', OR: '또는', ADD: '+', MINUS: '−', MULTIPLY: '×', DIVIDE: '÷', MOD: '나머지' };
@@ -220,13 +229,13 @@ function EditModal({ node, onClose, onSave, context }) {
     } catch (e) { setError(e.message); }
   }
   return <Modal title={node.type.startsWith('routine_')?'시작 설정':operationMap.get(node.fields?.API)?.label||definitions[node.type]?.[0] || '동작 설정'} onClose={onClose}><form onSubmit={save}>
-    {node.type.startsWith('routine_')&&<section className="start-method-section"><h3 className="choice-heading">언제 시작할까요?</h3><IconCards className="start-choices" label="시작 방식" value={draft.type} options={startOptions} onChange={changeStart}/></section>}
+    {node.type.startsWith('routine_')&&<section className="start-method-section"><h3 className="choice-heading">언제 시작할까요?</h3><StartChoices type={draft.type} onChange={changeStart}/></section>}
     {draft.type === 'routine_start' && <p className="form-note">상단의 실행 버튼을 누르면 이 흐름이 시작됩니다.</p>}
     {node.type === 'flow_stop' && <p className="form-note">이 단계에 도착하면 루틴 실행을 종료합니다.</p>}
-    {draft.type==='routine_event'&&<section className="watched-state-section"><h3 className="choice-heading">감지할 상태</h3><IconCards compact className="signal-choices" label="감지할 상태" value={draft.fields.EVENT} options={signalOptions.filter(o=>o.value!=='speed')} onChange={v=>setDraft({...draft,fields:{EVENT:v}})}/><p className="form-note">화면 위에서 상태 감지를 시작하면 이 상태가 바뀔 때 실행해요.</p></section>}
+    {draft.type==='routine_event'&&<section className="watched-state-section"><h3 className="choice-heading">감지할 상태</h3><IconCards compact className="signal-choices" label="감지할 상태" value={draft.fields.EVENT} options={signalOptions.filter(o=>o.value!=='speed')} onChange={v=>setDraft({...draft,fields:{EVENT:v}})}/><p className="form-note">루틴을 ON으로 켜면 차량 앱을 사용하는 동안 상태 변화를 감지해요.</p></section>}
     {node.type === 'variable_set' && <label className="form-field">변수 이름<input required maxLength={80} value={draft.fields.NAME} onChange={e => setDraft({ ...draft, fields: { ...draft.fields, NAME: e.target.value } })} /></label>}
     {['api_call','routine_api_event'].includes(draft.type)&&<ApiFields node={draft} onChange={setDraft} kinds={draft.type==='routine_api_event'?['subscribe']:['read','write','capability']} Expression={SimpleValue} fixed={draft.type==='routine_api_event'}/>}
-    {draft.type==='routine_api_event'&&<p className="form-note">화면 위에서 ‘상태 감지 시작’을 누르면 현재 화면에서 감지합니다. 이벤트 값은 조건과 동작에 연결할 수 있어요.</p>}
+    {draft.type==='routine_api_event'&&<p className="form-note">루틴을 ON으로 켜면 차량 앱을 사용하는 동안 감지합니다. 이벤트 값은 조건과 동작에 연결할 수 있어요.</p>}
     {draft.type==='api_call'&&<><p className="result-ready-note"><Icon name="result"/>결과는 다음 조건·동작에서 바로 선택할 수 있어요.</p><details className="save-result-options"><summary>고급 · 변수로도 저장</summary><TouchChoice label="결과 저장" value={draft.fields.NAME||''} options={[...new Set(['',draft.fields.NAME,'조회 결과',operationMap.get(draft.fields.API)?.label+' 결과'])].filter(v=>v!==undefined).map(v=>[v,v||'변수로 저장 안 함'])} onChange={v=>setDraft({...draft,fields:{...draft.fields,NAME:v}})}/>{draft.fields.NAME&&<FieldPicker label="저장할 항목" operationId={draft.fields.API} value={draft.fields.PATH} onChange={v=>setDraft({...draft,fields:{...draft.fields,PATH:v}})}/>}</details></>}
     {(params[node.type] || []).map(([key, label]) => key==='CONDITION'?<ConditionEditor key={key} node={inputOf(draft,key)} onChange={n=>setDraft({...draft,inputs:{...draft.inputs,[key]:{block:n}}})} context={context} Expression={Expression}/>:<SimpleValue key={key} label={label} node={inputOf(draft, key)} onChange={n => setDraft({ ...draft, inputs: { ...draft.inputs, [key]: { block: n } } })} />)}
     {expressionTypes.includes(node.type) && <Expression label="값" node={draft} onChange={n => setDraft({ ...n, id: draft.id, ...(draft.next ? { next: draft.next } : {}) })} />}
@@ -239,7 +248,7 @@ function Picker({ location, onPick, onClose }) {
   const [query, setQuery] = useState('');
   const [section,setSection]=useState('basic');
   const [rootStep,setRootStep]=useState(null);
-  if(location==='root')return <Modal title="시작 방식 추가" onClose={onClose}>{rootStep&&<Button type="button" variant="ghost" className="back-to-start" onClick={()=>setRootStep(null)}><Icon name="back"/>시작 방식</Button>}{!rootStep?<IconCards className="start-choices" label="시작 방식" options={startOptions} onChange={type=>type==='routine_start'?onPick(type):setRootStep(type)}/>:rootStep==='routine_event'?<><h3 className="choice-heading">감지할 상태</h3><IconCards compact className="signal-choices" label="감지할 상태" options={signalOptions.filter(o=>o.value!=='speed')} onChange={v=>onPick({...freshNode('routine_event'),fields:{EVENT:v}})}/></>:<ApiPickerOptions query="" root onPick={onPick}/>}</Modal>;
+  if(location==='root')return <Modal title="시작 방식 추가" onClose={onClose}><StartChoices type={rootStep} onChange={type=>type==='routine_start'?onPick(type):setRootStep(type)}/>{rootStep==='routine_event'?<><h3 className="choice-heading">감지할 상태</h3><IconCards compact className="signal-choices" label="감지할 상태" options={signalOptions.filter(o=>o.value!=='speed')} onChange={v=>onPick({...freshNode('routine_event'),fields:{EVENT:v}})}/></>:rootStep==='routine_api_event'?<ApiPickerOptions query="" root onPick={onPick}/>:null}</Modal>;
   const types = location === 'root' ? ['routine_start', 'routine_event'] : ['vehicle_climate', 'vehicle_fan', 'action_notify', 'action_speak', 'flow_if', 'flow_wait', 'flow_repeat', 'flow_while', 'variable_set', 'flow_stop'];
   const matches = types.filter(t => (definitions[t].join(' ') + describe(freshNode(t))).includes(query.trim()));
   return <Modal title={location === 'root' ? '시작 방식 추가' : '동작 추가'} onClose={onClose}><div className="api-picker-tabs" role="group" aria-label="동작 분류"><button className={section==='basic'?'selected':''} onClick={()=>setSection('basic')}><Icon name="grid"/>기본 동작</button><button className={section==='api'?'selected':''} onClick={()=>setSection('api')}><Icon name="CarInfo"/>차량·연결 기능</button></div><input className="action-search" placeholder="동작 찾기" aria-label="동작 찾기" value={query} onChange={e => setQuery(e.target.value)} />{section==='api'?<ApiPickerOptions query={query} root={location==='root'} onPick={onPick}/>:<div className="action-options">{matches.map(type => <button key={type} onClick={() => onPick(type)} className="action-option"><span className="node-icon"><Icon name={definitions[type][1]} /></span><span><strong>{definitions[type][0]}</strong><small>{definitions[type][2]}</small></span><Icon name="plus" /></button>)}{!matches.length && <p className="form-note">일치하는 동작이 없습니다. 차량·연결 기능에서도 찾아보세요.</p>}</div>}</Modal>;

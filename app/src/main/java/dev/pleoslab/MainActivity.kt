@@ -37,6 +37,7 @@ class MainActivity : Activity() {
     @Volatile private var foreground = false
     private var subscriptionGeneration = 0
     private val pending = java.util.concurrent.ConcurrentHashMap.newKeySet<Int>()
+    private val pendingActions = java.util.concurrent.ConcurrentHashMap<Int, String>()
     private var exportText: String? = null
     private val area = DoorArea(DoorValue.ROW_1_LEFT)
     private val vehicleApi by lazy { VehicleApi(this, ::emitEvent) }
@@ -141,13 +142,14 @@ class MainActivity : Activity() {
                 main.post {
                     if (!alive) return@post
                     pending.add(id)
+                    pendingActions[id] = request.optString("action")
                     main.postDelayed({ if (pending.contains(id)) fail(id, "기기 응답 시간이 초과됐어요.") }, 11000)
                     if (!foreground && request.optString("action") != "cancel") { fail(id, "앱 화면에서 다시 실행해 주세요."); return@post }
                     try {
                         when (request.getString("action")) {
                             "door" -> readDoor(id)
                             "speak" -> speak(id, request.getString("text"))
-                            "cancel" -> { tts?.stop(); vehicleApi.stopMotion(); connectApi.cancel(); cancelPending(id); reply(id, true) }
+                            "cancel" -> { tts?.stop(); vehicleApi.stopMotion(); connectApi.cancel(); cancelPending(id, executionOnly = true); reply(id, true) }
                             "api.invoke", "api.subscribe" -> apiRequest(id, request)
                             "api.unsubscribe" -> { val token=request.getString("token");vehicleApi.unsubscribe(token);connectApi.unsubscribe(token);reply(id,true) }
                             "api.clearSubscriptions" -> {subscriptionGeneration++;vehicleApi.clearSubscriptions();connectApi.clearSubscriptions();reply(id,true)}
@@ -155,6 +157,7 @@ class MainActivity : Activity() {
                             "permissionState" -> reply(id,permissionState())
                             "diagnostics" -> { reply(id, true); startActivity(Intent(this@MainActivity, DiagnosticsActivity::class.java)) }
                             "export" -> export(id, request.getString("text"), request.optString("name", "routine"))
+                            "import" -> importRoutine(id)
                             "community.request" -> communityApi.request(request, { alive && foreground && pending.contains(id) }, { reply(id, it) }, { fail(id, it) })
                             else -> fail(id, "지원하지 않는 기기 요청입니다.")
                         }
@@ -241,9 +244,51 @@ class MainActivity : Activity() {
         @Suppress("DEPRECATION")
         startActivityForResult(intent, 101)
     }
+    private fun importRoutine(id: Int) {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "*/*"
+            putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("application/json", "text/plain", "application/octet-stream"))
+        }
+        // The document picker pauses the app. Complete this request first, then
+        // deliver the selected file as data after the system returns a URI.
+        reply(id, true)
+        main.post {
+            if (alive && foreground) {
+                try {
+                    @Suppress("DEPRECATION")
+                    startActivityForResult(intent, 103)
+                } catch (e: Exception) {
+                    android.widget.Toast.makeText(this, "파일 선택기를 열지 못했어요: ${e.message}", android.widget.Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
     @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 103) {
+            if (resultCode != RESULT_OK) return
+            try {
+                val uri = data?.data ?: return
+                val bytes = contentResolver.openInputStream(uri)?.use { stream ->
+                    val output = java.io.ByteArrayOutputStream()
+                    val buffer = ByteArray(8192)
+                    while (true) {
+                        val count = stream.read(buffer)
+                        if (count < 0) break
+                        require(output.size() + count <= 500_000) { "루틴 파일은 500KB 이하로 선택해 주세요." }
+                        output.write(buffer, 0, count)
+                    }
+                    output.toByteArray()
+                } ?: error("파일을 읽지 못했어요.")
+                val payload = JSONObject().put("text", bytes.toString(Charsets.UTF_8)).put("name", "선택한 루틴 파일")
+                web.evaluateJavascript("window.dispatchEvent(new CustomEvent('pleos:import-file', { detail: $payload }));", null)
+            } catch (e: Exception) {
+                android.widget.Toast.makeText(this, "가져오기 실패: ${e.message}", android.widget.Toast.LENGTH_LONG).show()
+            }
+            return
+        }
         if (requestCode == 101 && resultCode == RESULT_OK) {
             try {
                 val uri = data?.data ?: return
@@ -259,18 +304,36 @@ class MainActivity : Activity() {
     private fun fail(id: Int, message: String) = deliver(id, JSONObject().put("ok", false).put("error", message))
     private fun deliver(id: Int, response: JSONObject) {
         main.post {
-            if (alive && pending.remove(id)) web.evaluateJavascript("window.PleosNative && window.PleosNative.resolve($id, $response);", null)
+            if (alive && pending.remove(id)) {
+                pendingActions.remove(id)
+                web.evaluateJavascript("window.PleosNative && window.PleosNative.resolve($id, $response);", null)
+            }
         }
     }
-    private fun cancelPending(except: Int? = null) { pending.toList().filter { it != except }.forEach { fail(it, "실행을 중지했어요.") } }
-    override fun onResume() { super.onResume(); foreground = true; if (::web.isInitialized) web.onResume() }
+    private fun cancelPending(except: Int? = null, executionOnly: Boolean = false) {
+        pending.toList().filter { it != except && (!executionOnly || pendingActions[it] in setOf("api.invoke", "door", "speak")) }
+            .forEach { fail(it, "실행을 중지했어요.") }
+    }
+    override fun onResume() {
+        super.onResume(); foreground = true
+        if (::web.isInitialized) {
+            web.onResume()
+            web.evaluateJavascript("window.PleosNative && window.PleosNative.resume();", null)
+        }
+    }
+    @Deprecated("Deprecated in Java")
+    override fun onBackPressed() {
+        web.evaluateJavascript("(() => { const dialog = document.querySelector('dialog[open]'); if (!dialog) return false; if (dialog.dispatchEvent(new Event('cancel', {cancelable: true}))) dialog.close(); return true; })();") { handled ->
+            if (handled != "true") { if (web.canGoBack()) web.goBack() else finish() }
+        }
+    }
     override fun onPause() {
         foreground = false; subscriptionGeneration++;tts?.stop(); vehicleApi.stopMotion(); vehicleApi.clearSubscriptions();connectApi.clearSubscriptions();connectApi.cancel();cancelPending()
         if (::web.isInitialized) { web.evaluateJavascript("window.PleosNative && window.PleosNative.pause();", null); web.onPause() }
         super.onPause()
     }
     override fun onDestroy() {
-        alive = false; main.removeCallbacksAndMessages(null); pending.clear(); tts?.stop(); tts?.shutdown()
+        alive = false; main.removeCallbacksAndMessages(null); pending.clear(); pendingActions.clear(); tts?.stop(); tts?.shutdown()
         try { vehicle?.release() } catch (_: Exception) {}
         vehicleApi.release();connectApi.release();communityApi.release()
         web.removeJavascriptInterface("AndroidBridge"); web.destroy()

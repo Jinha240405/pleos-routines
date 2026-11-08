@@ -1,8 +1,9 @@
 import {mockNative} from './native-fixture.js';
 import { test, expect } from '@playwright/test';
+import {readyEditor,useTemplate,runRoutine} from './editor-fixture.js';
 
 async function touchNumber(page,label,value){await page.getByRole('button',{name:label+' 숫자판 열기',exact:true}).click();const pad=page.getByRole('group',{name:label+' 숫자판',exact:true});await pad.getByRole('button',{name:'지우기',exact:true}).click();for(const digit of String(value))await pad.getByRole('button',{name:digit,exact:true}).click();await pad.getByRole('button',{name:'숫자 적용',exact:true}).click();}
-const ready = page => page.waitForFunction(() => window.__app?.editor);
+const ready = readyEditor;
 const closeLog = page => page.locator('#executionDialog .close-dialog').click();
 const card = (page, type) => page.locator(`[data-type="${type}"]`);
 const menu = async (page,type,action) => { await card(page,type).first().locator('.node-menu-button').click(); await page.getByRole('menuitem',{name:action,exact:true}).click(); };
@@ -10,16 +11,16 @@ test.beforeEach(async ({page}) => { await mockNative(page); await page.goto('/')
 
 test('test controls are removed and real bridge execution still reports results', async ({page}) => {
  await expect(page.locator('#testDialog, #testButton, #apiInspectorRoot')).toHaveCount(0);
- await page.locator('#runButton').click(); await expect(page.locator('#executionState')).toHaveText('실행 완료');
+ await runRoutine(page); await expect(page.locator('#executionState')).toHaveText('실행 완료');
  expect(await page.evaluate(()=>window.__device.climate)).toBe(22); expect(await page.evaluate(()=>window.__device.fan)).toBe(3);
- await page.evaluate(()=>window.__device.temperature=20); await page.locator('#runButton').click(); await expect(page.locator('#executionState')).toHaveText('실행 완료');
+ await page.evaluate(()=>window.__device.temperature=20); await runRoutine(page); await expect(page.locator('#executionState')).toHaveText('실행 완료');
  await page.locator('#resultButton').click(); await expect(page.locator('#logList')).toContainText('지금 온도가 좋아요');
 });
 test('editing a card updates execution and persists across reload', async ({page}) => {
  await card(page,'vehicle_climate').locator('.card-main').click();await touchNumber(page,'설정 온도 (°C)',21);await page.getByRole('button',{name:'적용',exact:true}).click();
- await expect(card(page,'vehicle_climate')).toContainText('21°C');await page.locator('#routineName').fill('우리 가족 출발');await page.locator('#routineName').blur();await expect(page.locator('#saveStatus')).toHaveText('모든 변경 사항 저장됨');
+ await expect(card(page,'vehicle_climate')).toContainText('21°C');await page.locator('#routineName').fill('우리 가족 출발');await page.locator('#routineName').blur();await expect(page.locator('#saveStatus')).toHaveText('저장됨 · 이 기기');
  await page.reload();await ready(page);await expect(page.locator('#routineName')).toHaveValue('우리 가족 출발');await expect(card(page,'vehicle_climate')).toContainText('21°C');
- await page.locator('#runButton').click();await expect(page.locator('#executionState')).toHaveText('실행 완료');expect(await page.evaluate(()=>window.__device.climate)).toBe(21);
+ await runRoutine(page);await expect(page.locator('#executionState')).toHaveText('실행 완료');expect(await page.evaluate(()=>window.__device.climate)).toBe(21);
 });
 test('action picker, delete, undo and redo preserve the flow', async ({page}) => {
  await page.locator('.add-step').first().click();await page.getByRole('textbox',{name:'동작 찾기'}).fill('대기');await page.getByRole('button',{name:/잠시 대기/}).click();
@@ -35,16 +36,16 @@ test('real drag moves an action between branches and undo restores it', async ({
 test('menu reorders and duplicates cards without duplicating IDs', async ({page}) => {
  await menu(page,'vehicle_fan','위로 이동');const cards=page.locator('.branch-grid>.flow-list').first().locator('.flow-card');await expect(cards.first()).toHaveAttribute('data-type','vehicle_fan');
  await menu(page,'vehicle_fan','복제');await expect(card(page,'vehicle_fan')).toHaveCount(2);
- await page.locator('#runButton').click();await expect(page.locator('#executionState')).toHaveText('실행 완료');
+ await runRoutine(page);await expect(page.locator('#executionState')).toHaveText('실행 완료');
 });
 test('import errors preserve data and legacy JSON remains compatible', async ({page}) => {
- await page.locator('#shareButton').click();const json=await page.locator('#routineJson').inputValue();
+ await page.locator('#shareButton').click();await page.locator('#routineJsonAdvanced summary').click();const json=await page.locator('#routineJson').inputValue();
  await page.locator('#routineJson').fill('{bad');await page.locator('#importJson').click();await expect(page.locator('#importError')).toContainText('JSON');
  const parsed=JSON.parse(json);parsed.name='기존 파일';await page.locator('#routineJson').fill(JSON.stringify(parsed));await page.locator('#importJson').click();await expect(page.locator('#shareDialog')).not.toBeVisible();
  await expect(page.locator('#routineCount')).toHaveText('2');await expect(card(page,'vehicle_climate')).toHaveCount(1);await expect(page.locator('#executionState')).toHaveText('실행 준비 완료');
 });
 test('trigger editing and explicit arming control native event execution', async ({page}) => {
- await card(page,'routine_start').locator('.card-main').click(); await page.getByRole('radio',{name:'차량 상태 감지',exact:true}).click(); await page.getByRole('button',{name:'적용',exact:true}).click();
+ await card(page,'routine_start').locator('.card-main').click(); await page.getByRole('radio',{name:'상태가 바뀌면 시작',exact:true}).click(); await page.getByRole('button',{name:'적용',exact:true}).click();
  await expect(card(page,'routine_event')).toContainText('도어'); await expect(page.locator('#watchEvents')).not.toBeChecked();
  await page.locator('#watchEvents').check(); await page.waitForFunction(()=>window.calls.some(c=>c.action==='api.subscribe'));
  const token=await page.evaluate(()=>window.calls.find(c=>c.action==='api.subscribe').token);
@@ -57,16 +58,16 @@ test('cancellation prevents later actions', async ({page}) => {
   const wait = {type:'flow_wait',inputs:{SECONDS:{block:{type:'value_number',fields:{VALUE:10}}}},next:{block:notify}};
   window.__app.addRoutine('중지 테스트',{blocks:{blocks:[{type:'routine_start',next:{block:wait}}]}});
  });
- await page.locator('#runButton').click();await expect(card(page,'flow_wait').locator('.card-main')).toBeDisabled();await page.locator('#stopButton').click();await expect(page.locator('#executionState')).toHaveText('실행 중지됨');
+ await runRoutine(page);await expect(card(page,'flow_wait').locator('.card-main')).toBeDisabled();await page.locator('#stopButton').click();await expect(page.locator('#executionState')).toHaveText('실행 중지됨');
  await page.locator('#resultButton').click();await expect(page.locator('#logList')).not.toContainText('should-never-run');
 });
 test('repeat and variable templates run through the card editor', async ({page}) => {
- await page.locator('#libraryTab').click();await page.getByRole('button',{name:/충전 리마인더/}).click();await page.evaluate(()=>window.__device.battery=20);
- await page.locator('#runButton').click();await expect(page.locator('#executionState')).toHaveText('실행 완료');await page.locator('#resultButton').click();await expect(page.locator('#logList')).toContainText('배터리가 부족해요');await page.locator('#variablesTab').click();await expect(page.locator('#variablesList')).toContainText('충전기준');await expect(page.locator('#variablesList')).toContainText('30');
+ await useTemplate(page,/충전 리마인더/);await page.evaluate(()=>window.__device.battery=20);
+ await runRoutine(page);await expect(page.locator('#executionState')).toHaveText('실행 완료');await page.locator('#resultButton').click();await expect(page.locator('#logList')).toContainText('배터리가 부족해요');await page.locator('#variablesTab').click();await expect(page.locator('#variablesList')).toContainText('충전기준');await expect(page.locator('#variablesList')).toContainText('30');
 });
 test('touch condition editing changes the branch and invalid keypad values are rejected', async ({page}) => {
  await card(page,'flow_if').locator('.card-main').click();await touchNumber(page,'비교할 값',30);await page.getByRole('button',{name:'적용',exact:true}).click();
- await page.locator('#runButton').click();await expect(page.locator('#executionState')).toHaveText('실행 완료');await page.locator('#resultButton').click();await expect(page.locator('#logList')).toContainText('지금 온도가 좋아요');await closeLog(page);
+ await runRoutine(page);await expect(page.locator('#executionState')).toHaveText('실행 완료');await page.locator('#resultButton').click();await expect(page.locator('#logList')).toContainText('지금 온도가 좋아요');await closeLog(page);
  await card(page,'vehicle_climate').locator('.card-main').click();await page.getByRole('button',{name:'설정 온도 (°C) 숫자판 열기'}).click();const pad=page.getByRole('group',{name:'설정 온도 (°C) 숫자판',exact:true});await pad.getByRole('button',{name:'지우기',exact:true}).click();await pad.getByRole('button',{name:'±',exact:true}).click();await pad.getByRole('button',{name:'숫자 적용',exact:true}).click();await expect(pad.getByRole('alert')).toContainText('숫자');
 });
 test('desktop and mobile keep readable text with no side panel or overflow', async ({page}) => {
@@ -77,7 +78,7 @@ test('desktop and mobile keep readable text with no side panel or overflow', asy
   expect(await page.locator('.node-title').first().evaluate(el=>parseFloat(getComputedStyle(el).fontSize))).toBeGreaterThanOrEqual(16);
   await page.screenshot({path:`artifacts/cards-${width}.png`,fullPage:true});
  }
- await page.locator('#runButton').click();await expect(page.locator('#executionState')).toHaveText('실행 완료');expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(375);expect(errors).toEqual([]);
+ await runRoutine(page);await expect(page.locator('#executionState')).toHaveText('실행 완료');expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(375);expect(errors).toEqual([]);
 });
 test('mobile picker preserves query through keyboard resize and dialog traps focus', async ({page}) => {
  await page.setViewportSize({width:375,height:812});await page.locator('.add-step').first().click();const search=page.getByRole('textbox',{name:'동작 찾기'});await search.fill('조건');
