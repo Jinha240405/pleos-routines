@@ -1,6 +1,6 @@
 # 개발 환경과 실행
 
-2026-11-02. 현재 소스는 블록 편집기와 Android 앱입니다. 초기 진단 앱은 DiagnosticsActivity에 보존했습니다.
+아래 명령은 저장소 루트에서 실행합니다. 현재 소스는 블록 편집기와 Android 앱이며, release 서명 방법은 [RELEASE.md](RELEASE.md)를 참고하세요.
 
 ## 웹 / Android
 
@@ -24,15 +24,17 @@ JDK 17, Android SDK 35, Gradle 8.10.2, AGP 8.8.2, Vehicle SDK 2.3.2를 사용합
 # emulator 패키지가 없는 개발 PC에서 한 번 실행
 sdkmanager 'emulator'
 ./scripts/install-pleos-image.ps1
-./start-emulator.ps1
+./scripts/start-emulator.ps1
 # 부팅 후 다른 터미널
 ./build.ps1 -Install
-./console.ps1
+./scripts/console.ps1
 ```
 
 첫 실행 시 이미지를 내려받고 검증한 뒤 SDK에 설치하고 AVD를 만듭니다. 이미 설치된 기기의 사용자 데이터는 지우지 않습니다. 실행 스크립트는 RAM 4096MB, Cold Boot를 사용합니다. AVD 정의는 기본적으로 `ANDROID_USER_HOME/avd`에 있습니다.
 
 Virtual Console: http://127.0.0.1:8088/ . 콘솔에서 지원하는 차량 항목과 앱에서 구현한 SDK API는 서로 다릅니다.
+
+검은 화면이나 EGL 그래픽 오류가 발생하면 에뮬레이터를 종료하고 `./scripts/start-emulator.ps1 -Gpu host -DisableVulkan`으로 다시 시작하세요. 0.6.1 제출 APK는 해당 그래픽 설정에서 화면 로딩을 확인했습니다. 처음 부팅할 때 기본 내비게이션이 앞에 나타나면 초기 로딩이 끝난 후 루틴 앱을 다시 실행합니다.
 
 편집기는 정차/P단에서 사용합니다. D단에서 “주행 중에는 사용할 수 없습니다.”가 나타나는 것은 Pleos 시스템의 주행 중 사용 제한입니다. 콘솔에서 P를 선택하면 다시 열립니다.
 
@@ -48,4 +50,4 @@ Virtual Console: http://127.0.0.1:8088/ . 콘솔에서 지원하는 차량 항�
 - https://document.pleos.ai/docs/connect/guide/getting-started/application-development/use-vehicle-emulator
 - https://developer.android.com/studio/run/emulator-acceleration
 
-실제 앱 설치·도어 응답 등 런타임 결과는 VERIFICATION.md에서 확인합니다.
+실제 앱 설치·도어 응답 등 런타임 결과는 [VERIFICATION.md](VERIFICATION.md)에서 확인합니다. 오픈소스 고지는 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)에 있습니다.

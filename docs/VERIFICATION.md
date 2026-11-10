@@ -1,6 +1,18 @@
 # 검증 기록
 
-## 현재 버전 0.6.0 — 2026-11-03
+## 제출 버전 0.6.1 — 2026-11-10
+
+- `./build.ps1 -Release`: 성공. `assembleRelease` 및 `lintVitalRelease` 완료. versionCode 8, 앱 이름 `루틴`.
+- APK: [`../apk/투게더_루틴_release.apk`](../apk/투게더_루틴_release.apk), 34,625,081 bytes. SHA-256: `e9bad1aa862fcf9959dfb716042a74cd0e5774dfda2ddd56fe38ba7341286d33`.
+- 전용 RSA 3072-bit 배포 키로 서명했고 `apksigner verify`의 APK Signature Scheme v2 검증을 통과했습니다. 인증서 SHA-256: `49eb4bdfd45bfc6ec24a3caff99a645c49a89b630d4595d9606afe200dbcdda9`. 개인 키와 비밀번호는 저장소에 포함하지 않습니다.
+- 패키지 검사에서 `debuggable=false`, `BuildConfig.DEBUG=false`, `BUILD_TYPE=release`를 확인했습니다. 서명 환경변수 없이 release를 빌드하면 중단되는 것도 확인했습니다.
+- `npm test`: **55/55 통과**. `npm run test:production`: 최종 번들에서 ON/OFF 저장, 기본 OFF, 반응형 화면, 로컬 커뮤니티, CSP, 외부 네트워크 요청 없음 검사 통과.
+- 문서 경로 정리 후 재생성한 현재 소스의 assets 103개가 서명된 APK 내부와 바이트 단위로 일치했습니다. README의 네 항목과 문서 링크, 이동한 PowerShell 스크립트 구문을 확인했습니다.
+- Pleos Connect 2.1.0 / Android 14 / x86_64 에뮬레이터의 임시 read-only 인스턴스(사용자 10)에 설치하고, 콜드 시작과 재진입, `내 루틴`·공식 템플릿 화면 표시를 확인했습니다. 기존 AVD의 데이터는 보존했습니다.
+- 이 PC의 headless 소프트웨어 그래픽 모드에서는 화면 출력 문제가 있어 **host GPU / Vulkan 비활성화**로 확인했습니다. 에뮬레이터 설정은 [SETUP.md](SETUP.md)를 참고하세요. 로컬 증빙: `artifacts/submission-0.6.1/release-screen-final.png`, `launch-host.txt`, `signature.txt`.
+- 이번 확인은 APK 설치와 화면 실행 검증입니다. 모든 SDK 동작의 실차 검증·백그라운드 자동화·공개 커뮤니티 연결을 완료했다는 의미는 아닙니다. 제출 release의 커뮤니티 주소는 비어 있으며, 공유는 기존 로컬 개발 환경에서 사용합니다.
+
+## 이전 버전 0.6.0 — 2026-11-03
 
 - 기존 블록으로 생활 루틴 5개 추가: 빈 동승석 정리, 충전 후 출발 준비, 차박 독서 자리, 도착 후 다음 일정, 캠핑 철수 브리핑. 총 17개 템플릿. API 지원을 추정해 성공으로 대체하지 않으며 실차 작동 검증과 구분합니다.
 - 커뮤니티: 파일 기반 로컬 서버, 실제 게시물 업로드·검색·분류·정렬·다운로드·소유자 삭제. 서버 재시작 후 보존, 동시 쓰기, 다른 기기의 삭제 거부, 잘못된 블록·출처 거부를 검사했습니다. 공개 인터넷 서비스 배포는 하지 않았습니다.

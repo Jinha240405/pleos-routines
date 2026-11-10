@@ -4,8 +4,13 @@
 local.properties
 **/build/
 *.apk
+!/apk/*_release.apk
 *.jks
 *.keystore
+*.p12
+*.pfx
+*.clixml
+keystore.properties
 .env
 .env.*
 !.env.example

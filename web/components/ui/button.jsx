@@ -1,4 +1,4 @@
-// Adapted from shadcn/ui new-york-v4, MIT. See THIRD_PARTY_NOTICES.md.
+// Adapted from shadcn/ui new-york-v4, MIT. See docs/THIRD_PARTY_NOTICES.md.
 import React from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cva } from 'class-variance-authority';

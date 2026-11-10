@@ -44,4 +44,4 @@ if (-not (Test-Path -LiteralPath (Join-Path $env:ANDROID_USER_HOME 'avd/Pleos_Co
     'no' | & "$env:ANDROID_HOME/cmdline-tools/latest/bin/avdmanager.bat" create avd --name Pleos_Connect_v2_1 --package $package.path --device 'Pleos_Connect_v2_0'
     if ($LASTEXITCODE -ne 0) { throw 'AVD creation failed.' }
 }
-Write-Output 'Run ./start-emulator.ps1, then ./build.ps1 -Install.'
+Write-Output 'Run ./scripts/start-emulator.ps1, then ./build.ps1 -Install.'
